@@ -4,6 +4,11 @@ Easy to use program to backup data.
 
 # todo
 
+- whatif:
+    - no transfer
+    - calc files new, modified, or skip
+    - calc Gb/Mb new, modified, or skip
+
 - count:
     - files updated (overwritten)
     - files new (doesn't exist yet)
@@ -12,6 +17,7 @@ Easy to use program to backup data.
     - Gb/Mbytes actually updated
     - time taken
     - average write speed
+    - list failed writes: dirs, files, reads, etc
 - verify directories existence *before* starting copy [option]
 - flag to auto-update file if newer than dest [default: warn]
 - verify recursion
