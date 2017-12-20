@@ -28,7 +28,7 @@ def print_usage(drive="c:"):
     disk_usage = shutil.disk_usage(drive)
     msg = (
         "\n{drive}"
-        "\nTotal: {total}"
+        "\nTotal: {total} [{free_percent:0.0f}% free]"
         "\nUsed: {used}"
         "\nFree: {free}"
     ).format(
@@ -36,6 +36,7 @@ def print_usage(drive="c:"):
         total = human_readable_size(disk_usage.total),
         used = human_readable_size(disk_usage.used),
         free = human_readable_size(disk_usage.free),
+        free_percent = (disk_usage.free / disk_usage.total) * 100
     )
     print(msg)
 
