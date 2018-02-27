@@ -19,6 +19,11 @@ app_config = {
     ],
 }
 
+STATS = {
+    "source_total": 0,
+    "copied_total": "NYI",
+    "skipped_total": "NYI",
+}
 
 
 # def human_readable_size2(num_bytes):
@@ -77,17 +82,14 @@ def test_listdir(src=None, dest=None):
     # source_path = os.path.join(src, names)
 
 def test_walk(src=None, dest=None):
-    # sort of from: https://docs.python.org/3.1/library/shutil.html?highlight=shutil#example
     if not src:
         src = app_config['source_dir']
     if not dest:
         dest = app_config['dest_dir']
 
     for root, dirs, files in os.walk(src):
-        # print(root, "consumes", end=" ")
+        # all files in dir:
         # print(sum(getsize(join(root, name)) for name in files), end=" ")
-        # print("bytes in", len(files), "non-directory files")
-
         msg = (
             "\nroot = {root}"
             "\ndirs = {dirs}"
@@ -97,8 +99,16 @@ def test_walk(src=None, dest=None):
             dirs=dirs,
             files=files
         )
-
         print(msg)
+
+        for file in files:
+            full_path = os.path.join(root, file)
+            size = os.path.getsize(full_path)
+            msg = (
+                "{name} = {size}"
+            ).format(name=file, size=size)
+            print(msg)
+            STATS['source_total'] += size
 
         # ignore dirs
         for dir in dirs:
@@ -107,9 +117,6 @@ def test_walk(src=None, dest=None):
                 print("skip ", dir)
                 dirs.remove(dir)
 
-    # msg = (
-    #     ""
-    # )
 if __name__ == "__main__":
     print_drive_usage("c:")
     # print_drive_usage("d:")
@@ -120,4 +127,16 @@ if __name__ == "__main__":
     test_walk()
 
 
+    msg = (
+        "\nStats"
+        "\ntotal usage of source= {total}"
+        "\ntotal (actually) copied of source= {total_copied}"
+        "\ntotal (total skipped duplicates) = {total_skipped}"
+    ).format(
+        total=human_readable_size(STATS['source_total']),
+        total_copied='NYI', # human_readable_size(STATS['copied_total']),
+        total_skipped='NYI' # human_readable_size(STATS['skipped_total']),
+    )
+    print(msg)
     print("Done.")
+

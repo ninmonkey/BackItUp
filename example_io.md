@@ -17,6 +17,14 @@ shutil.disk_usage : checks usage of entire drive/mount, not the argument path
 
  - last mod/creation: https://docs.python.org/3.1/library/os.html#os.stat
 
+# filesize
+    >>> info.st_size
+    9
+
+    >>> os.path.getsize(path)
+    9
+
+shows correct info. File manager in windows appears to always be >= 1k if not 0
 
 # os.path
 
