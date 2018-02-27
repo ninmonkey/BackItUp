@@ -5,6 +5,7 @@ Easy to use program to backup data.
 # todo
 
 - verify path is non-relative to prevent mistakes
+- verify dest_dir has enough space on that drive
 - whatif:
     - no transfer
     - calc files new, modified, or skip
