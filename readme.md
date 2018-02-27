@@ -24,3 +24,4 @@ Easy to use program to backup data.
 - verify exclude directories
 - exclude globs
 - auto-create dest dirs that don't exist
+- test if multiprocessing or threading will decrease time
