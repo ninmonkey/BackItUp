@@ -4,6 +4,7 @@ Easy to use program to backup data.
 
 # todo
 
+- verify path is non-relative to prevent mistakes
 - whatif:
     - no transfer
     - calc files new, modified, or skip
@@ -25,3 +26,31 @@ Easy to use program to backup data.
 - exclude globs
 - auto-create dest dirs that don't exist
 - test if multiprocessing or threading will decrease time
+- make user confirm filepaths
+
+    Are you sure?
+    src = src
+    dest = dest
+    files copied = bytes
+
+# white/blacklisting
+
+## blacklisting:
+
+dirs (full):
+    currently require full path match
+
+dirs (relative):
+    NYI using wildcards
+
+files (full):
+    NYI
+files (relative):
+    NYI
+
+## whitelisting:
+
+dirs:
+    NYI
+files:
+    NYI

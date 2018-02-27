@@ -1,7 +1,9 @@
 import math
 import shutil
+# from os.path import join
+# import os.path.getsize
 import os
-from os.path import join
+from os.path import getsize, join
 
 # const
 # BYTES_TO_MB = 1 / (1024**2)
@@ -11,8 +13,11 @@ from os.path import join
 app_config = {
     "source_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data",
     "dest_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_output_data",
+    "exclude_dirs": [
+        r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data\a\skip_me",
+        r"C:\\",
+    ],
 }
-    # "exclude_dirs": [r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data\a\skip_me"],
 
 
 
@@ -71,7 +76,40 @@ def test_listdir(src=None, dest=None):
 
     # source_path = os.path.join(src, names)
 
+def test_walk(src=None, dest=None):
+    # sort of from: https://docs.python.org/3.1/library/shutil.html?highlight=shutil#example
+    if not src:
+        src = app_config['source_dir']
+    if not dest:
+        dest = app_config['dest_dir']
 
+    for root, dirs, files in os.walk(src):
+        # print(root, "consumes", end=" ")
+        # print(sum(getsize(join(root, name)) for name in files), end=" ")
+        # print("bytes in", len(files), "non-directory files")
+
+        msg = (
+            "\nroot = {root}"
+            "\ndirs = {dirs}"
+            "\nfiles = {files}"
+        ).format(
+            root=root,
+            dirs=dirs,
+            files=files
+        )
+
+        print(msg)
+
+        # ignore dirs
+        for dir in dirs:
+            full_dir = os.path.join(root, dir)
+            if full_dir in app_config["exclude_dirs"]:
+                print("skip ", dir)
+                dirs.remove(dir)
+
+    # msg = (
+    #     ""
+    # )
 if __name__ == "__main__":
     print_drive_usage("c:")
     # print_drive_usage("d:")
@@ -79,7 +117,7 @@ if __name__ == "__main__":
     print("usage:")
     print_drive_usage(r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data")
     # print_usage(app_config["source_dir"])
-    test_listdir()
+    test_walk()
 
 
     print("Done.")

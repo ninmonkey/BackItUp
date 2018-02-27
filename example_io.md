@@ -76,6 +76,10 @@ shutil.disk_usage : checks usage of entire drive/mount, not the argument path
 
     > When topdown is True, the caller can modify the dirnames list in-place (perhaps using del or slice assignment), and walk() will only recurse into the subdirectories whose names remain in dirnames; this can be used to prune the search, impose a specific order of visiting, or even to inform walk() about directories the caller creates or renames before it resumes walk() again. Modifying dirnames when topdown is False is ineffective, because in bottom-up mode the directories in dirnames are generated before dirpath itself is generated.
 
+https://docs.python.org/3/library/os.html#os.walk
+
+When topdown is True, the caller can modify the dirnames list in-place (perhaps using del or slice assignment), and walk()
+
 # refs
 
 - http://www.diveintopython3.net/files.html
