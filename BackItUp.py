@@ -10,12 +10,22 @@ app_config = {
         r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data\a\skip_me",
         r"C:\\",
     ],
+    "exclude_files_globs": [],
+    "exclude_files": [
+        r"C:\pagefile.sys",
+        r"C:\swapfile.sys",
+        r"C:\hiberfil.sys",
+        # recycle bin?,
+    ],
+
 }
 
 STATS = {
     "source_total": 0,
     "copied_total": "NYI",
     "skipped_total": "NYI",
+    "source_files": "NYI",
+    "copied_files": "NYI",
 }
 
 def human_readable_size(num_bytes, suffix='B'):

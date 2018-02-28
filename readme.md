@@ -6,12 +6,13 @@ Easy to use program to backup data.
 
 - verify path is non-relative to prevent mistakes
 - verify dest_dir has enough space on that drive
+- log stuff
 - whatif:
     - no transfer
     - calc files new, modified, or skip
     - calc Gb/Mb new, modified, or skip
 
-- count:
+- count: (STATS dict)
     - files updated (overwritten)
     - files new (doesn't exist yet)
     - files skipped (same)
