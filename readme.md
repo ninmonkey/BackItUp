@@ -2,7 +2,17 @@
 
 Easy to use program to backup data.
 
+# add dir to 2nd drive:
+D:\backup_2017_12_13
+D:\backup_shared_data\
+
+# blacklist
+a bunch of stuff in My Documents (dropbox, etc.)
+
 # todo
+
+
+- timestamps for profiling
 
 - verify path is non-relative to prevent mistakes
 - verify dest_dir has enough space on that drive
@@ -28,6 +38,7 @@ Easy to use program to backup data.
 - exclude globs
 - auto-create dest dirs that don't exist
 - test if multiprocessing or threading will decrease time
+- show full disk space usage on both (because some files may aggregate more than the source drive)
 - make user confirm filepaths
 
     Are you sure?

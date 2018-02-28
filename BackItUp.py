@@ -3,6 +3,8 @@ import shutil
 import os
 from os.path import getsize, join
 
+WHATIF = True
+
 app_config = {
     "source_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data",
     "dest_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_output_data",
@@ -22,8 +24,8 @@ app_config = {
 
 STATS = {
     "source_total": 0,
-    "copied_total": "NYI",
-    "skipped_total": "NYI",
+    "copied_total": 0,
+    "skipped_total": 0,
     "source_files": "NYI",
     "copied_files": "NYI",
 }
@@ -32,9 +34,9 @@ def human_readable_size(num_bytes, suffix='B'):
     num = num_bytes
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
         if abs(num) < 1024.0:
-            return "{num:.2f}{unit}{suffix}".format(num=num, unit=unit, suffix=suffix)
+            return "{num:.1f}{unit}{suffix}".format(num=num, unit=unit, suffix=suffix)
         num /= 1024.0
-    return "{num:.2f}{unit}{suffix}".format(num=num, unit='Yi', suffix=suffix)
+    return "{num:.1f}{unit}{suffix}".format(num=num, unit='Yi', suffix=suffix)
 
 def print_drive_usage(drive="c:"):
     disk_usage = shutil.disk_usage(drive)
@@ -74,13 +76,27 @@ def walk_entry(src=None, dest=None):
         print(msg)
 
         for file in files:
-            full_path = os.path.join(root, file)
-            size = os.path.getsize(full_path)
+            full_path_source = os.path.join(root, file)
+            full_path_dest = os.path.join(dest, file)
+            size = os.path.getsize(full_path_source)
+            STATS['source_total'] += size
+
             msg = (
                 "{name} = {size}"
             ).format(name=file, size=size)
             print(msg)
-            STATS['source_total'] += size
+
+            msg = (
+                "\ncopy files"
+                "\n\tSource: {src}"
+                "\n\tDest: {dest}"
+            ).format(src=full_path_source, dest=full_path_dest)
+            print(msg)
+            if True:
+                # copy
+                STATS['copied_total'] += size
+                STATS['skipped_total'] += size
+
 
         for dir in dirs:
             full_dir = os.path.join(root, dir)
@@ -102,13 +118,13 @@ if __name__ == "__main__":
 
     msg = (
         "\nStats"
-        "\ntotal usage of source= {total}"
-        "\ntotal (actually) copied of source= {total_copied}"
-        "\ntotal (total skipped duplicates) = {total_skipped}"
+        "\ntotal size of source = {total}"
+        "\ntotal size (actually) copied from source = {total_copied}"
+        "\ntotal size (total skipped duplicates) = {total_skipped}"
     ).format(
         total=human_readable_size(STATS['source_total']),
-        total_copied='NYI', # human_readable_size(STATS['copied_total']),
-        total_skipped='NYI' # human_readable_size(STATS['skipped_total']),
+        total_copied=human_readable_size(STATS['copied_total']),
+        total_skipped=human_readable_size(STATS['skipped_total']),
     )
     print(msg)
     print("Done.")
