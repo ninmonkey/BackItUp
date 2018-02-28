@@ -13,6 +13,10 @@ shutil.copy2() : preserves metadata
 shutil.copytree() : use copy2
 shutil.disk_usage : checks usage of entire drive/mount, not the argument path
 
+# see also REGEX filters
+
+https://stackoverflow.com/a/5141829/341744
+
 # os.stat(path)
 
  - last mod/creation: https://docs.python.org/3.1/library/os.html#os.stat

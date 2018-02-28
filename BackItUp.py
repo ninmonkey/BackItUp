@@ -3,14 +3,14 @@ import shutil
 import os
 from os.path import getsize, join
 
-WHATIF = True
+WHATIF = False
 
 app_config = {
     "source_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data",
     "dest_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_output_data",
     "exclude_dirs": [
         r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data\a\skip_me",
-        r"C:\\",
+        # r"C:\\",
     ],
     "exclude_files_globs": [],
     "exclude_files": [
@@ -77,33 +77,43 @@ def walk_entry(src=None, dest=None):
 
         for file in files:
             full_path_source = os.path.join(root, file)
-            full_path_dest = os.path.join(dest, file)
+            full_path_dest = os.path.join(root, file)
             size = os.path.getsize(full_path_source)
             STATS['source_total'] += size
 
             msg = (
                 "{name} = {size}"
-            ).format(name=file, size=size)
+            ).format(name=file, size=human_readable_size(size))
             print(msg)
 
             msg = (
                 "\ncopy files"
                 "\n\tSource: {src}"
                 "\n\tDest: {dest}"
-            ).format(src=full_path_source, dest=full_path_dest)
+            ).format(
+                src=full_path_source,
+                dest=full_path_dest,
+            )
             print(msg)
-            if True:
-                # copy
-                STATS['copied_total'] += size
-                STATS['skipped_total'] += size
+
+            # filter_filenames = [r"C:\pagefile.sys"]
+
+            if WHATIF:
+                pass
+            else:
+                pass
+
+        for cur_dir in dirs:
+            full_dir = os.path.join(root, cur_dir)
 
 
-        for dir in dirs:
-            full_dir = os.path.join(root, dir)
+
+
             # ignore dirs
             if full_dir in app_config["exclude_dirs"]:
-                print("skip ", dir)
-                dirs.remove(dir)
+                print("\tskip: ", cur_dir)
+                dirs.remove(cur_dir)
+                # todo: Or use del cur_dir # or similar
                 continue
             try:
                 os.makedirs(full_dir)

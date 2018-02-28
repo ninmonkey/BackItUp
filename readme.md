@@ -10,7 +10,9 @@ D:\backup_shared_data\
 a bunch of stuff in My Documents (dropbox, etc.)
 
 # todo
-
+filter files glob
+    [r"C:\pagefile.sys"],
+    ["*.sys"],
 
 - timestamps for profiling
 
