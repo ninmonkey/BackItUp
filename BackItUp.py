@@ -6,19 +6,30 @@ from os.path import getsize, join
 WHATIF = False
 
 app_config = {
-    "source_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data",
-    "dest_dir": r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_output_data",
+    "source_dir":"C:/Users/cppmo_000/Documents/2017/BackItUp/test_input_data",
+    "dest_dir":"C:/Users/cppmo_000/Documents/2017/BackItUp/test_output_data",
     "exclude_dirs": [
-        r"C:\Users\cppmo_000\Documents\2017\BackItUp\test_input_data\a\skip_me",
-        # r"C:\\",
+       "C:/Users/cppmo_000/Documents/2017/BackItUp/test_input_data/a/skip_me",
+        #"C:/",
     ],
-    "exclude_files_globs": [],
+    # "exclude_files_globs": [
+    #     {"sys files": "*.sys"},
+    # ],
+
+    # todo: wcombine `exclude_files` and `exclude_filepaths`
+        # by allowing REGEX or even just GLOBs
+    # global excludes ignoring paths
     "exclude_files": [
-        r"C:\pagefile.sys",
-        r"C:\swapfile.sys",
-        r"C:\hiberfil.sys",
+       "pagefile.sys",
+       "swapfile.sys",
+       "hiberfil.sys",
         # recycle bin?,
     ],
+
+    # exclusions by path
+    # "exclude_filepaths": [
+    #     r"C:/Users/cppmo_000/AppData/Roaming",
+    # ]
 
 }
 
@@ -30,7 +41,7 @@ STATS = {
     "copied_files": "NYI",
 }
 
-def human_readable_size(num_bytes, suffix='B'):
+def humanize_bytes(num_bytes, suffix='B'):
     num = num_bytes
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
         if abs(num) < 1024.0:
@@ -47,9 +58,9 @@ def print_drive_usage(drive="c:"):
         "\nFree: {free}"
     ).format(
         drive=os.path.splitdrive(drive)[0],
-        total=human_readable_size(disk_usage.total),
-        used=human_readable_size(disk_usage.used),
-        free=human_readable_size(disk_usage.free),
+        total=humanize_bytes(disk_usage.total),
+        used=humanize_bytes(disk_usage.used),
+        free=humanize_bytes(disk_usage.free),
         free_percent=(disk_usage.free / disk_usage.total) * 100
     )
     print(msg)
@@ -75,15 +86,25 @@ def walk_entry(src=None, dest=None):
         )
         print(msg)
 
+        # todo: raise Exception("Last: 1] filter glob 2] copy file ! WHATIF")
+
+        # blacklist
+        for file in files[:]:
+            if file in app_config["exclude_files"]:
+                files.remove(file)
+
         for file in files:
+            # print("x {}".format(file))
+
+
             full_path_source = os.path.join(root, file)
             full_path_dest = os.path.join(root, file)
             size = os.path.getsize(full_path_source)
             STATS['source_total'] += size
 
             msg = (
-                "{name} = {size}"
-            ).format(name=file, size=human_readable_size(size))
+                "{name} size = {size}"
+            ).format(name=file, size=humanize_bytes(size))
             print(msg)
 
             msg = (
@@ -105,9 +126,6 @@ def walk_entry(src=None, dest=None):
 
         for cur_dir in dirs:
             full_dir = os.path.join(root, cur_dir)
-
-
-
 
             # ignore dirs
             if full_dir in app_config["exclude_dirs"]:
@@ -132,9 +150,9 @@ if __name__ == "__main__":
         "\ntotal size (actually) copied from source = {total_copied}"
         "\ntotal size (total skipped duplicates) = {total_skipped}"
     ).format(
-        total=human_readable_size(STATS['source_total']),
-        total_copied=human_readable_size(STATS['copied_total']),
-        total_skipped=human_readable_size(STATS['skipped_total']),
+        total=humanize_bytes(STATS['source_total']),
+        total_copied=humanize_bytes(STATS['copied_total']),
+        total_skipped=humanize_bytes(STATS['skipped_total']),
     )
     print(msg)
     print("Done.")
