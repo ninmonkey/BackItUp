@@ -12,6 +12,9 @@
 shutil.copy2() : preserves metadata
 shutil.copytree() : use copy2
 shutil.disk_usage : checks usage of entire drive/mount, not the argument path
+shutil.copytree(src, dst, symlinks=False, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False)
+
+    Recursively copy an entire directory tree rooted at src, returning the destination directory. The destination directory, named by dst, must not already exist; it will be created as well as missing parent directories. Permissions and times of directories are copied with copystat(), individual files are copied using shutil.copy2().
 
 # see also REGEX filters
 

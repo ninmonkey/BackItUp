@@ -19,12 +19,12 @@ STATS = {
     "copied_files": "NYI",
 }
 
-def walk_entry(src=None, dest=None):
+def walk_entry(src=None, dest_root=None):
     # logic entry point
     if not src:
         src = app_config['source_dir']
-    if not dest:
-        dest = app_config['dest_dir']
+    if not dest_root:
+        dest_root = app_config['dest_dir']
 
     for root, dirs, files in os.walk(src):
         # all files in dir:
@@ -48,7 +48,7 @@ def walk_entry(src=None, dest=None):
 
         for file in files:
             full_path_source = os.path.join(root, file)
-            full_path_dest = os.path.join(root, file)
+            full_path_dest = os.path.join(dest_root, file)
             size = os.path.getsize(full_path_source)
             STATS['source_total'] += size
 
@@ -67,10 +67,16 @@ def walk_entry(src=None, dest=None):
             )
             print(msg)
 
+
+            # import pdb; pdb.set_trace()
             # todo: raise Exception("Last: 1] filter glob 2] copy file ! WHATIF")
             if WHATIF:
-                pass
+                print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
             else:
+                print("copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
+                # shutil.copy2(
+                #     src=
+                #     dst=)
                 pass
 
         for cur_dir in dirs:
