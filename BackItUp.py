@@ -57,13 +57,21 @@ def walk_entry(src=None, dest_root=None):
             ).format(name=file, size=humanize_bytes(size))
             print(msg)
 
+            full_path_dest2 = os.path.join(
+                dest_root,
+                os.path.relpath(root, src),
+                file,
+            )
+
             msg = (
                 "\ncopy files"
                 "\n\tSource: {src}"
                 "\n\tDest: {dest}"
+                "\n\tDest2: {dest2}"
             ).format(
                 src=full_path_source,
                 dest=full_path_dest,
+                dest2=full_path_dest2,
             )
             print(msg)
 
@@ -73,7 +81,7 @@ def walk_entry(src=None, dest_root=None):
             if WHATIF:
                 print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
             else:
-                print("copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
+                print("copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest2))
                 # shutil.copy2(
                 #     src=
                 #     dst=)

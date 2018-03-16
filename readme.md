@@ -10,6 +10,8 @@ D:\backup_shared_data\
 a bunch of stuff in My Documents (dropbox, etc.)
 
 # todo
+- try
+    http://techs.studyhorror.com/python-copy-move-sub-folders-recursively-i-92
 - convert print()s to logs()
 filter files glob
     [r"C:\pagefile.sys"],
