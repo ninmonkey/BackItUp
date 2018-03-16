@@ -1,8 +1,8 @@
 app_config = {
-    "source_dir":"C:/Users/cppmo_000/Documents/2017/BackItUp/test_input_data",
-    "dest_dir":"C:/Users/cppmo_000/Documents/2017/BackItUp/test_output_data",
+    "source_dir":"C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data",
+    "dest_dir":"C:/Users/cppmo_000/Documents/2018/BackItUp/test_output_data",
     "exclude_dirs": [
-       "C:/Users/cppmo_000/Documents/2017/BackItUp/test_input_data/a/skip_me",
+       "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
         #"C:/",
     ],
     # "exclude_files_globs": [
