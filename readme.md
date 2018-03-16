@@ -18,6 +18,7 @@ filter files glob
     ["*.sys"],
 
 - timestamps for profiling
+    - test with zero console writes, only log files.
 
 - verify path is non-relative to prevent mistakes
 - verify dest_dir has enough space on that drive

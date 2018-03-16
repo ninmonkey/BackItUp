@@ -11,31 +11,30 @@ from app.locals import (
 
 WHATIF = False
 
-STATS = {
-    "source_total": 0,
-    "copied_total": 0,
-    "skipped_total": 0,
-    "source_files": "NYI",
-    "copied_files": "NYI",
-}
+STATS = {} # defaults in _reset_stats()
 
 def _reset_stats():
-    STATS["source_total"] = 0
-    STATS["copied_total"] = 0
-    STATS["skipped_total"] = 0
-    # STATS["source_files"] = 0
-    # STATS["copied_files"] = 0
+    STATS["source_total_bytes"] = 0
+    STATS["copied_total_bytes"] = 0
+    STATS["skipped_total_bytes"] = 0
+    STATS["source_filecount"] = 0
+    STATS["copied_filecount"] = 0
+    STATS["files_blacklisted"] = 0
+
 
 def print_stats():
     msg = (
         "\nStats"
-        "\ntotal size of source = {total}"
-        "\ntotal size (actually) copied from source = {total_copied}"
-        "\ntotal size (total skipped duplicates) = {total_skipped}"
+        "\ntotal size of source = {source_total_bytes}"
+        "\ntotal size (actually) copied from source = {copied_total_bytes}"
+        "\ntotal size (total skipped duplicates) = {skipped_total_bytes}"
+        # "\ntotal files in source = {source_filecount}"
+        # "\ntotal files in source = {source_filecount}"
     ).format(
-        total=humanize_bytes(STATS['source_total']),
-        total_copied=humanize_bytes(STATS['copied_total']),
-        total_skipped=humanize_bytes(STATS['skipped_total']),
+        source_total_bytes=humanize_bytes(STATS['source_total_bytes']),
+        copied_total_bytes=humanize_bytes(STATS['copied_total_bytes']),
+        skipped_total_bytes=humanize_bytes(STATS['skipped_total_bytes']),
+        # total_skipped=humanize_bytes(STATS['source_filecount']),
     )
     print(msg)
 
@@ -60,7 +59,7 @@ def walk_entry(source_root=None, dest_root=None):
             dirs=dirs,
             files=files,
         )
-        # print(msg)
+        print(msg)
 
         # blacklist
         for file in files[:]:
@@ -78,7 +77,7 @@ def walk_entry(source_root=None, dest_root=None):
                 file,
             )
 
-            STATS['source_total'] += size
+            STATS['source_total_bytes'] += size
 
             msg = (
                 "{name} size = {size}"
@@ -87,24 +86,28 @@ def walk_entry(source_root=None, dest_root=None):
 
             msg = (
                 "\ncopy files"
-                "\n\tSource: {source_root}"
-                "\n\tDest: {dest}"
+                "\n\tSource: {full_path_source}"
+                "\n\tDest: {full_path_dest}"
             ).format(
-                source_root=full_path_source,
-                dest=full_path_dest,
+                full_path_source=full_path_source,
+                full_path_dest=full_path_dest,
             )
-            # print(msg)
-
+            print(msg)
 
             if WHATIF:
                 print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
-                pass
+                continue
+
+            print("src = {}".format(full_path_source))
+            print("dst = {}".format(full_path_dest))
+            if not os.path.exists(full_path_dest):
+                print("NOT exists = {}".format(full_path_dest))
             else:
-                # print("copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
-                # shutil.copy2(
-                #     source_root=
-                #     dst=)
-                pass
+                print("exists = {}".format(full_path_dest))
+
+            full_path_dest_dir = os.path.dirname(full_path_dest)
+            os.makedirs(full_path_dest_dir, exist_ok=True)
+            shutil.copy2(full_path_source, full_path_dest)
 
         for cur_dir in dirs:
             full_dir_path = os.path.join(root, cur_dir)

@@ -8,8 +8,8 @@ __pycache__/
 
 # this project
 logs/
-test_input_data/
-test_output_data/
+test_input_data/*
+test_output_data/*
 
 # Distribution / packaging
 .Python
