@@ -97,7 +97,6 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
             # print(msg)
 
             full_path_dest_dir = os.path.dirname(full_path_dest)
-            os.makedirs(full_path_dest_dir, exist_ok=True)
 
             msg = (
                 "\ncopy files"
@@ -113,9 +112,11 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
                 print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
                 continue
 
-            # print(full_path_dest_dir)
-            # print(full_path_dest)
-            shutil.copy2(full_path_source, full_path_dest_dir)
+            if not files_are_same(full_path_source, full_path_dest):
+                os.makedirs(full_path_dest_dir, exist_ok=True)
+                shutil.copy2(full_path_source, full_path_dest_dir)
+                # print(full_path_dest_dir)
+                # print(full_path_dest)
 
             # if not files_are_same(full_path_source, full_path_dest):
             #     shutil.copy2(full_path_source, full_path_dest)

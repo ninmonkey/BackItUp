@@ -8,15 +8,19 @@ def valid_path(path):
     return os.path.isdir(path)
 
 def files_are_same(full_path_source, full_path_dest):
-    # save I/O for duplicate files
-    # is_same = True
+    """
+    save I/O on duplicate files
+
+    full_path_source:   source path including filename
+    full_path_dest:     dest path including filename
+    """
+    if not os.path.exists(full_path_dest):
+        return False
+
     size_source = os.path.getsize(full_path_source)
     size_dest = os.path.getsize(full_path_dest)
     filename_source = os.path.basename(full_path_source)
     filename_dest = os.path.basename(full_path_dest)
-
-    if not os.path.exists(full_path_dest):
-        return False
 
     if size_source != size_dest:
         # logging.debug("size_source != size_dest")
@@ -27,7 +31,7 @@ def files_are_same(full_path_source, full_path_dest):
         return False
 
     logging.debug("files_are_same(): {},\nfor source: {}\nfor dest: {}".format(
-        is_same,
+        True,
         full_path_source,
         full_path_dest)
     )
