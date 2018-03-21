@@ -12,8 +12,8 @@ from app.locals import (
 )
 
 WHATIF = False
-STATS = {} # defaults in _reset_stats()
-logging.basicConfig(filename="logs/main.log", filemode='w', level=logging.DEBUG)
+STATS = {} # defaults defined in _reset_stats()
+logging.basicConfig(filename=os.path.join("logs", "main.log"), filemode='w', level=logging.DEBUG)
 
 
 def _reset_stats():
@@ -131,9 +131,10 @@ def walk_entry(source_root=None, dest_root=None):
                 pass
 
 if __name__ == "__main__":
+    logging.info("Config name = {}".format(app_config['name']))
     print("WhatIf mode: {}".format(WHATIF))
     print_drive_usage(app_config["source_dir"])
-    print_drive_usage(app_config["dest_dir"])
+    # print_drive_usage(app_config["dest_dir"])
     print_drive_usage(r"D:\temp_backup_test")
 
     # walk_entry()
@@ -141,5 +142,5 @@ if __name__ == "__main__":
     # walk_entry(app_config["source_dir"], r"D:\temp_backup_test")
 
     print_stats()
-    print("Done.")
+    print("\nDone.")
 
