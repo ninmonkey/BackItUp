@@ -1,7 +1,9 @@
+import logging
 import math
-import shutil
 import os
 from os.path import getsize, join
+import shutil
+import logging
 
 from app.config import app_config
 from app.locals import (
@@ -10,17 +12,21 @@ from app.locals import (
 )
 
 WHATIF = False
-
 STATS = {} # defaults in _reset_stats()
+logging.basicConfig(filename="logs/main.log", filemode='w', level=logging.DEBUG)
+
 
 def _reset_stats():
-    STATS["source_total_bytes"] = 0
-    STATS["copied_total_bytes"] = 0
-    STATS["skipped_total_bytes"] = 0
-    STATS["source_filecount"] = 0
-    STATS["copied_filecount"] = 0
-    STATS["files_blacklisted"] = 0
+    STATS["source_total_bytes"] = 0 # number of bytes read from source
+    STATS["copied_total_bytes"] = 0 # number of bytes written to dest
+    STATS["skipped_total_bytes"] = 0# bytes 'skipped' when file is already existing
+    STATS["source_filecount"] = 0   # numbers of source files parsed
+    STATS["copied_filecount"] = 0   # number of files copied (not skipped)
+    # STATS["files_blacklisted"] = 0  # blacklist counter
 
+def print_config():
+    # logging.log("JSON config")
+    raise NotImplementedError("convert config.py to pretty JSON?")
 
 def print_stats():
     msg = (
@@ -36,6 +42,7 @@ def print_stats():
         skipped_total_bytes=humanize_bytes(STATS['skipped_total_bytes']),
         # total_skipped=humanize_bytes(STATS['source_filecount']),
     )
+    logging.info("\n"+msg)
     print(msg)
 
 def walk_entry(source_root=None, dest_root=None):
@@ -112,7 +119,7 @@ def walk_entry(source_root=None, dest_root=None):
         for cur_dir in dirs:
             full_dir_path = os.path.join(root, cur_dir)
 
-            # ignore dirs
+            # blacklist dirs
             if full_dir_path in app_config["exclude_dirs"]:
                 print("\tskipping: {}".format(cur_dir))
                 dirs.remove(cur_dir)

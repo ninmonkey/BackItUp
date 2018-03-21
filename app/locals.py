@@ -1,5 +1,6 @@
 import os
 import shutil
+import logging
 
 def humanize_bytes(num_bytes, suffix='B'):
     # convert bytes to human readable unit
@@ -25,4 +26,5 @@ def print_drive_usage(drive="c:/"):
         free=humanize_bytes(disk_usage.free),
         free_percent=(disk_usage.free / disk_usage.total) * 100,
     )
+    logging.info("\n"+msg+"\n")
     print(msg)
