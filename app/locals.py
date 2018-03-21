@@ -2,6 +2,38 @@ import os
 import shutil
 import logging
 
+def valid_path(path):
+    if not path:
+        return False
+    return os.path.isdir(path)
+
+def files_are_same(full_path_source, full_path_dest):
+    # save I/O for duplicate files
+    # is_same = True
+    size_source = os.path.getsize(full_path_source)
+    size_dest = os.path.getsize(full_path_dest)
+    filename_source = os.path.basename(full_path_source)
+    filename_dest = os.path.basename(full_path_dest)
+
+    if not os.path.exists(full_path_dest):
+        return False
+
+    if size_source != size_dest:
+        # logging.debug("size_source != size_dest")
+        return False
+
+    if filename_source != filename_dest:
+        # logging.debug("filename_source != filename_dest")
+        return False
+
+    logging.debug("files_are_same(): {},\nfor source: {}\nfor dest: {}".format(
+        is_same,
+        full_path_source,
+        full_path_dest)
+    )
+
+    return True
+
 def humanize_bytes(num_bytes, suffix='B'):
     # convert bytes to human readable unit
     num = num_bytes

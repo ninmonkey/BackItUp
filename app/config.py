@@ -1,4 +1,5 @@
 import os.path
+from .locals import valid_path
 
 app_config = None
 app_config_all = [
@@ -64,14 +65,9 @@ app_config_all = [
            "hiberfil.sys",
             # todo: recycle bin?,
         ],
-    }
+    },
 
 ]
-
-def valid_path(path):
-    if not path:
-        return False
-    return os.path.isdir(path)
 
 def validate_config(config):
     # validate config file

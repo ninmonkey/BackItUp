@@ -7,13 +7,16 @@ import logging
 
 from app.config import app_config
 from app.locals import (
+    files_are_same,
     humanize_bytes,
     print_drive_usage,
 )
 
 WHATIF = False
 STATS = {} # defaults defined in _reset_stats()
-logging.basicConfig(filename=os.path.join("logs", "main.log"), filemode='w', level=logging.DEBUG)
+logging.basicConfig(
+    filename=os.path.join("logs", "main.log"),
+    filemode='w', level=logging.DEBUG)
 
 
 def _reset_stats():
@@ -93,33 +96,50 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
             ).format(name=file, size=humanize_bytes(size))
             # print(msg)
 
+            full_path_dest_dir = os.path.dirname(full_path_dest)
+            os.makedirs(full_path_dest_dir, exist_ok=True)
+
             msg = (
                 "\ncopy files"
                 "\n\tSource: {full_path_source}"
-                "\n\tDest: {full_path_dest}"
+                "\n\tDest: {full_path_dest_dir}"
             ).format(
                 full_path_source=full_path_source,
-                full_path_dest=full_path_dest,
+                full_path_dest_dir=full_path_dest_dir,
             )
-            print(msg)
+            logging.debug(msg)
 
             if WHATIF:
                 print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
                 continue
 
+            # print(full_path_dest_dir)
+            # print(full_path_dest)
+            shutil.copy2(full_path_source, full_path_dest_dir)
+
+            # if not files_are_same(full_path_source, full_path_dest):
+            #     shutil.copy2(full_path_source, full_path_dest)
+            #     STATS["copied_total_bytes"] += size
+            #     print("writing anyway")
+            # else:
+            #     print("SAME FILES!")
+
+
             # print("src = {}".format(full_path_source))
             # print("dst = {}".format(full_path_dest))
-            if not os.path.exists(full_path_dest):
-                # print("NOT exists = {}".format(full_path_dest))
-                pass
-            else:
-                # print("exists = {}".format(full_path_dest))
-                pass
+            # if not os.path.exists(full_path_dest):
+            #     print("NOT exists = {}".format(full_path_dest))
+            #     pass
+            # else:
+            #     print("exists = {}".format(full_path_dest))
+            #     if False or not files_are_same(full_path_source, full_path_dest):
+            #         shutil.copy2(full_path_source, full_path_dest)
+            #         STATS["copied_total_bytes"] += size
+            #         print("writing anyway")
+            #     else:
+            #         print("SAME FILES!")
+            #     pass
 
-            full_path_dest_dir = os.path.dirname(full_path_dest)
-            os.makedirs(full_path_dest_dir, exist_ok=True)
-            shutil.copy2(full_path_source, full_path_dest)
-            STATS["copied_total_bytes"] += size
 
         for cur_dir in dirs:
             full_dir_path = os.path.join(root, cur_dir)

@@ -18,6 +18,7 @@ a bunch of stuff in My Documents (dropbox, etc.)
 
 
 # todo
+- refactor main() to use copy_file() etc to split up logic
 - try
     http://techs.studyhorror.com/python-copy-move-sub-folders-recursively-i-92
 - convert print()s to logs()
