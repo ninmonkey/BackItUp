@@ -91,9 +91,9 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
 
             STATS['source_total_bytes'] += size
 
-            msg = (
-                "{name} size = {size}"
-            ).format(name=file, size=humanize_bytes(size))
+            # msg = (
+            #     "{name} size = {size}"
+            # ).format(name=file, size=humanize_bytes(size))
             # print(msg)
 
             full_path_dest_dir = os.path.dirname(full_path_dest)
@@ -115,32 +115,9 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
             if not files_are_same(full_path_source, full_path_dest):
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
-                # print(full_path_dest_dir)
-                # print(full_path_dest)
-
-            # if not files_are_same(full_path_source, full_path_dest):
-            #     shutil.copy2(full_path_source, full_path_dest)
-            #     STATS["copied_total_bytes"] += size
-            #     print("writing anyway")
-            # else:
-            #     print("SAME FILES!")
-
-
-            # print("src = {}".format(full_path_source))
-            # print("dst = {}".format(full_path_dest))
-            # if not os.path.exists(full_path_dest):
-            #     print("NOT exists = {}".format(full_path_dest))
-            #     pass
-            # else:
-            #     print("exists = {}".format(full_path_dest))
-            #     if False or not files_are_same(full_path_source, full_path_dest):
-            #         shutil.copy2(full_path_source, full_path_dest)
-            #         STATS["copied_total_bytes"] += size
-            #         print("writing anyway")
-            #     else:
-            #         print("SAME FILES!")
-            #     pass
-
+                STATS["copied_total_bytes"] += size
+            else:
+                STATS["skipped_total_bytes"] += size
 
         for cur_dir in dirs:
             full_dir_path = os.path.join(root, cur_dir)
