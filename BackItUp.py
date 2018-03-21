@@ -45,7 +45,7 @@ def print_stats():
     logging.info("\n"+msg)
     print(msg)
 
-def walk_entry(source_root=None, dest_root=None):
+def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
     # logic entry point
     if not source_root:
         source_root = app_config['source_dir']
@@ -68,13 +68,15 @@ def walk_entry(source_root=None, dest_root=None):
         )
         print(msg)
 
-        # blacklist
+        # blacklist 1. hardcoded filenames
         for file in files[:]:
             if file in app_config["exclude_files"]:
                 print("\tskipping: ", file)
                 files.remove(file)
-            # todo: 1] filter glob
 
+        # blacklist 2. glob/regex filenames todo
+
+        # good files to copy
         for file in files:
             full_path_source = os.path.join(root, file)
             size = os.path.getsize(full_path_source)
@@ -105,21 +107,24 @@ def walk_entry(source_root=None, dest_root=None):
                 print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
                 continue
 
-            print("src = {}".format(full_path_source))
-            print("dst = {}".format(full_path_dest))
+            # print("src = {}".format(full_path_source))
+            # print("dst = {}".format(full_path_dest))
             if not os.path.exists(full_path_dest):
-                print("NOT exists = {}".format(full_path_dest))
+                # print("NOT exists = {}".format(full_path_dest))
+                pass
             else:
-                print("exists = {}".format(full_path_dest))
+                # print("exists = {}".format(full_path_dest))
+                pass
 
             full_path_dest_dir = os.path.dirname(full_path_dest)
             os.makedirs(full_path_dest_dir, exist_ok=True)
             shutil.copy2(full_path_source, full_path_dest)
+            STATS["copied_total_bytes"] += size
 
         for cur_dir in dirs:
             full_dir_path = os.path.join(root, cur_dir)
 
-            # blacklist dirs
+            # blacklist 3. fullpath dirs
             if full_dir_path in app_config["exclude_dirs"]:
                 print("\tskipping: {}".format(cur_dir))
                 dirs.remove(cur_dir)

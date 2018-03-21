@@ -9,6 +9,14 @@ D:\backup_shared_data\
 # blacklist
 a bunch of stuff in My Documents (dropbox, etc.)
 
+# determine skip-copy behavior
+
+    mode: skip: 
+        skip if name and size are equal    
+    mode: append:
+        always write even if dest file exists
+
+
 # todo
 - try
     http://techs.studyhorror.com/python-copy-move-sub-folders-recursively-i-92

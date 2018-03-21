@@ -71,7 +71,7 @@ app_config_all = [
 def valid_path(path):
     if not path:
         return False
-    return os.path.isdir()
+    return os.path.isdir(path)
 
 def validate_config(config):
     # validate config file
@@ -89,7 +89,7 @@ def load_config(name):
             return config
     raise ValueError("Unknowing config name = {}".format(name))
 
-app_config = load_config("debug")
 app_config = load_config("jake_backup")
+app_config = load_config("debug")
 validate_config(app_config)
 
