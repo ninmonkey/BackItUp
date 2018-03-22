@@ -3,6 +3,7 @@ import math
 import os
 from os.path import getsize, join
 import shutil
+import time
 import logging
 
 from app.config import app_config
@@ -25,6 +26,9 @@ def _reset_stats():
     STATS["skipped_total_bytes"] = 0# bytes 'skipped' when file is already existing
     STATS["source_filecount"] = 0   # numbers of source files parsed
     STATS["copied_filecount"] = 0   # number of files copied (not skipped)
+    STATS["backup_start"] = 0   # ticks
+    STATS["backup_end"] = 0   # ticks
+
     # STATS["files_blacklisted"] = 0  # blacklist counter
 
 def print_config():
@@ -37,13 +41,16 @@ def print_stats():
         "\ntotal size of source = {source_total_bytes}"
         "\ntotal size (actually) copied from source = {copied_total_bytes}"
         "\ntotal size (total skipped duplicates) = {skipped_total_bytes}"
-        # "\ntotal files in source = {source_filecount}"
-        # "\ntotal files in source = {source_filecount}"
+        "\ntotal files in source = {source_filecount}"
+        "\ntotal files in copied = {copied_filecount}"
+        "\nTime taken (in seconds) {time_secs:.04f}"
     ).format(
         source_total_bytes=humanize_bytes(STATS['source_total_bytes']),
         copied_total_bytes=humanize_bytes(STATS['copied_total_bytes']),
         skipped_total_bytes=humanize_bytes(STATS['skipped_total_bytes']),
-        # total_skipped=humanize_bytes(STATS['source_filecount']),
+        source_filecount = STATS['source_filecount'],
+        copied_filecount = STATS['copied_filecount'],
+        time_secs = STATS["backup_end"] - STATS["backup_start"],
     )
     logging.info("\n"+msg)
     print(msg)
@@ -57,9 +64,9 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
 
     _reset_stats()
 
+    STATS["backup_start"] = time.time()
+
     for root, dirs, files in os.walk(source_root):
-        # all files in dir:
-        # print(sum(getsize(join(root, name)) for name in files), end=" ")
         msg = (
             "\nroot = {root}"
             "\ndirs = {dirs}"
@@ -69,7 +76,9 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
             dirs=dirs,
             files=files,
         )
-        print(msg)
+        logging.debug(msg)
+
+        STATS["source_filecount"] += 1
 
         # blacklist 1. hardcoded filenames
         for file in files[:]:
@@ -94,7 +103,7 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
             # msg = (
             #     "{name} size = {size}"
             # ).format(name=file, size=humanize_bytes(size))
-            # print(msg)
+            # logging.debug(msg)
 
             full_path_dest_dir = os.path.dirname(full_path_dest)
 
@@ -116,6 +125,7 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
                 STATS["copied_total_bytes"] += size
+                STATS["copied_filecount"] += 1
             else:
                 STATS["skipped_total_bytes"] += size
 
@@ -123,15 +133,23 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
             full_dir_path = os.path.join(root, cur_dir)
 
             # blacklist 3. fullpath dirs
-            if full_dir_path in app_config["exclude_dirs"]:
-                print("\tskipping: {}".format(cur_dir))
-                dirs.remove(cur_dir)
-                # todo: Or use del cur_dir # or similar
-                continue
+            # print("\n\ttest to exclude: \n\t{}".format(full_dir_path))
+            for path in app_config["exclude_dirs"]:
+                # print("\tvs:\n\t{}".format(path))
+
+                # if full_dir_path == path: # this failed when mixed slashes for/back
+                if os.path.normpath(full_dir_path) == os.path.normpath(path):
+                    print("Skipping blacklisted directory = {}".format(path))
+                    logging.info("Skipping blacklisted directory = {}".format(path))
+                    dirs.remove(cur_dir)
+                    continue
+
             try:
                 os.makedirs(full_dir_path)
-            except FileExistsError:
+            except FileExistsError: # wait do I want this? obsolete requirement?
                 pass
+
+    STATS["backup_end"] = time.time()
 
 if __name__ == "__main__":
     logging.info("Config name = {}".format(app_config['name']))
