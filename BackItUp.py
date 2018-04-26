@@ -1,12 +1,13 @@
+from os.path import getsize, join
+import logging
 import logging
 import math
 import os
-from os.path import getsize, join
 import shutil
 import time
-import logging
 
-from app.config import app_config
+# from app.config import app_config, load_config
+import app.config
 from app.locals import (
     files_are_same,
     humanize_bytes,
@@ -43,7 +44,7 @@ def print_stats():
         "\ntotal size (total skipped duplicates) = {skipped_total_bytes}"
         "\ntotal files in source = {source_filecount}"
         "\ntotal files in copied = {copied_filecount}"
-        "\nTime taken (in seconds) {time_secs:.04f}"
+        "\nTime taken (in seconds) {time_secs:.3f}"
     ).format(
         source_total_bytes=humanize_bytes(STATS['source_total_bytes']),
         copied_total_bytes=humanize_bytes(STATS['copied_total_bytes']),
@@ -52,7 +53,7 @@ def print_stats():
         copied_filecount = STATS['copied_filecount'],
         time_secs = STATS["backup_end"] - STATS["backup_start"],
     )
-    logging.info("\n"+msg)
+    logging.info("\n{}".format(msg))
     print(msg)
 
 def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
@@ -152,6 +153,12 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
     STATS["backup_end"] = time.time()
 
 if __name__ == "__main__":
+    from app import config
+    app_config = config.load_config("debug")
+    # app_config = load_config("jake_backup")
+
+
+
     logging.info("Config name = {}".format(app_config['name']))
     print("WhatIf mode: {}".format(WHATIF))
     print_drive_usage(app_config["source_dir"])

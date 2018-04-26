@@ -70,7 +70,10 @@ app_config_all = [
 ]
 
 def validate_config(config):
-    # validate config file
+    # basic validate config file, check directories
+    if not config:
+        raise ValueError("No config given!")
+
     path_source = config["source_dir"]
     path_dest = config["dest_dir"]
     if not valid_path(path_source) or not valid_path(path_dest):
@@ -82,10 +85,8 @@ def validate_config(config):
 def load_config(name):
     for config in app_config_all:
         if config["name"] == name:
+            validate_config(config)
             return config
     raise ValueError("Unknowing config name = {}".format(name))
 
-app_config = load_config("jake_backup")
-app_config = load_config("debug")
-validate_config(app_config)
 
