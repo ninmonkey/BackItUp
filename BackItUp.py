@@ -1,3 +1,5 @@
+import app
+
 from os.path import getsize, join
 import logging
 import logging
@@ -8,13 +10,13 @@ import time
 
 # from app.config import app_config, load_config
 import app.config
-from app.locals import (
+from app.app_locals import (
     files_are_same,
     humanize_bytes,
     print_drive_usage,
 )
 
-WHATIF = False
+WHATIF = True
 STATS = {} # defaults defined in _reset_stats()
 logging.basicConfig(
     filename=os.path.join("logs", "main.log"),
@@ -63,7 +65,6 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
         dest_root = app_config['dest_dir']
 
     _reset_stats()
-
     STATS["backup_start"] = time.time()
 
     for root, dirs, files in os.walk(source_root):
@@ -79,11 +80,11 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
         logging.debug(msg)
 
         STATS["source_filecount"] += 1
-        print("{}".format(os.path.join(root, file)))
 
         # blacklist 1. hardcoded filenames
         for file in files[:]:
             if file in app_config["exclude_files"]:
+                print("{}".format(os.path.join(root, file)))
                 print("\tskipping: ", file)
                 files.remove(file)
 
@@ -182,9 +183,6 @@ if __name__ == "__main__":
     from app import config
     app_config = config.load_config("debug")
     # app_config = load_config("jake_backup")
-
-    raise Exception("USE fnmatch JUST  make file + path filters regex/globs")
-
 
     logging.info("Config name = {}".format(app_config['name']))
     print("WhatIf mode: {}".format(WHATIF))

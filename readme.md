@@ -61,6 +61,9 @@ filter files glob
     dest = dest
     files copied = bytes
 
+## speed
+    fnmatch on os.path.walk()
+
 # white/blacklisting
 
 ## blacklisting:

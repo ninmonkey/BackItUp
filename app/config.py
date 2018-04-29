@@ -1,12 +1,13 @@
 import os.path
-from .locals import valid_path
+from app.app_locals import valid_path
 
 app_config = None
 app_config_all = [
     {
         "name": "debug",
-        "source_dir": r"C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data",
-        "dest_dir": r"C:/Users/cppmo_000/Documents/2018/BackItUp/test_output_data",
+        "source_dir": "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data",
+        "dest_dir": "C:/Users/cppmo_000/Documents/2018/BackItUp/test_output_data",
+
         "exclude_dirs": [
            "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
         ],
@@ -19,10 +20,10 @@ app_config_all = [
 
         # global excludes ignoring paths
         "exclude_files": [
-           # "pagefile.sys",
-           # "swapfile.sys",
-           # "hiberfil.sys",
-            # todo: recycle bin?,
+            "$Recycle.Bin",
+            "pagefile.sys",
+            "swapfile.sys",
+            "hiberfil.sys",
         ],
     },
 
@@ -31,6 +32,7 @@ app_config_all = [
         "source_dir": "",
         "dest_dir": "",
         "exclude_dirs": [
+            "C:/$Recycle.Bin",
             "C:/Users/cppmo_000/Dropbox",
             "C:/Users/cppmo_000/AppData/Roaming/Apple Computer/MobileSync",
             "C:/Users/cppmo_000/Music/iTunes",
@@ -48,18 +50,20 @@ app_config_all = [
             "C:/Users/cppmo_000/Documents/SEGA",
             "C:/Users/cppmo_000/Documents/UnrealTournament",
             "C:/Users/cppmo_000/Documents/WB Games",
-            "C:\Users/cppmo_000/Documents/my games",
+            "C:/Users/cppmo_000/Documents/my games",
         ],
-        # exclude globs / regex
-        "exclude_files_globs": [
-            # {"sys files": "*.sys"},
-        ],
+        # # exclude globs / regex
+        # "exclude_files_globs": [
+        #     # {"sys files": "*.sys"},
+        # ],
+
+
         # global excludes ignoring paths
         "exclude_files": [
-           "pagefile.sys",
-           "swapfile.sys",
-           "hiberfil.sys",
-            # todo: recycle bin?,
+            "$Recycle.Bin",
+            "pagefile.sys",
+            "swapfile.sys",
+            "hiberfil.sys",
         ],
     },
 
