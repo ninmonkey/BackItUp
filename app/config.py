@@ -1,5 +1,6 @@
 import os.path
-from app.app_locals import valid_path
+
+from .app_locals import valid_path
 
 app_config = None
 app_config_all = [
@@ -9,7 +10,7 @@ app_config_all = [
         "dest_dir": "C:/Users/cppmo_000/Documents/2018/BackItUp/test_output_data",
 
         "exclude_dirs": [
-           "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
+            "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
         ],
         # "exclude_files_globs": [
         #     "*.pyc",        # todo
@@ -33,6 +34,8 @@ app_config_all = [
         "dest_dir": "",
         "exclude_dirs": [
             "C:/$Recycle.Bin",
+            "C:/Users/cppmo_000/AppData/Roaming/Apple Computer",
+            "C:/Users/cppmo_000/AppData",
             "C:/Users/cppmo_000/Dropbox",
             "C:/Users/cppmo_000/AppData/Roaming/Apple Computer/MobileSync",
             "C:/Users/cppmo_000/Music/iTunes",
@@ -69,7 +72,7 @@ app_config_all = [
 
 ]
 
-def validate_config(config):
+def validate_config(config, strict=True):
     # basic validate config file, check directories
     if not config:
         raise ValueError("No config given!")
@@ -80,6 +83,13 @@ def validate_config(config):
         raise ValueError("Bad Paths for \nsource = {}\ndest = {}".format(
             path_source, path_dest)
         )
+
+    if strict:
+        for dir in config["exclude_dirs"]:
+            if not os.path.isdir(dir):
+                print("E".format(dir))
+                raise ValueError("Might be a typo. Path doesn't exist: {}".format(dir))
+
     return True
 
 def load_config(name):
