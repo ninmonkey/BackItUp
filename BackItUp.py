@@ -27,9 +27,8 @@ def _reset_stats():
     STATS["skipped_total_bytes"] = 0# bytes 'skipped' when file is already existing
     STATS["source_filecount"] = 0   # numbers of source files parsed
     STATS["copied_filecount"] = 0   # number of files copied (not skipped)
-    STATS["backup_start"] = 0   # ticks
-    STATS["backup_end"] = 0   # ticks
-
+    STATS["backup_start"] = 0       # seconds
+    STATS["backup_end"] = 0         # seconds
     # STATS["files_blacklisted"] = 0  # blacklist counter
 
 def print_config():
@@ -80,6 +79,7 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
         logging.debug(msg)
 
         STATS["source_filecount"] += 1
+        print("{}".format(os.path.join(root, file)))
 
         # blacklist 1. hardcoded filenames
         for file in files[:]:
@@ -87,7 +87,33 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
                 print("\tskipping: ", file)
                 files.remove(file)
 
-        # blacklist 2. glob/regex filenames todo
+        # todo: blacklist 2. glob/regex filenames
+
+        # first try:
+        #     if fnmatch.fnmatch(file, '*.txt'):
+
+        # for file in files[:]:
+        #     path = os.path.join(root, file)
+        #     print("File = {}".format(path))
+        #     for pattern in app_config["exclude_files_globs"]:
+        #         print(pattern)
+
+        # pattern = os.path.join(root, pattern)
+        # print(glob("c*/*.pyc"))
+        # if file in glob("*.pyc"):
+        #     print("\tskip glob: ", file)
+
+
+        # for file in files[:]:
+        #     for pattern in app_config["exclude_files_globs"]:
+        #         pattern = os.path.join(root, pattern)
+        #         print(pattern)
+        #         if file in glob(pattern):
+        #             print("\tskip glob: ", file)
+
+                # print("{}".format(os.path.join(root, file)))
+                # files.remove(file)
+
 
         # good files to copy
         for file in files:
@@ -157,6 +183,7 @@ if __name__ == "__main__":
     app_config = config.load_config("debug")
     # app_config = load_config("jake_backup")
 
+    raise Exception("USE fnmatch JUST  make file + path filters regex/globs")
 
 
     logging.info("Config name = {}".format(app_config['name']))

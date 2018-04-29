@@ -8,55 +8,51 @@ app_config_all = [
         "source_dir": r"C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data",
         "dest_dir": r"C:/Users/cppmo_000/Documents/2018/BackItUp/test_output_data",
         "exclude_dirs": [
-           r"C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
-            #"C:/",
+           "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
         ],
         # "exclude_files_globs": [
-        #     {"sys files": "*.sys"},
+        #     "*.pyc",        # todo
+        #     "pagefile.sys",
+        #     "swapfile.sys",
+        #     "hiberfil.sys",
         # ],
 
-        # by allowing REGEX or even just GLOBs
         # global excludes ignoring paths
         "exclude_files": [
-           "pagefile.sys",
-           "swapfile.sys",
-           "hiberfil.sys",
-            # recycle bin?,
+           # "pagefile.sys",
+           # "swapfile.sys",
+           # "hiberfil.sys",
+            # todo: recycle bin?,
         ],
-
-        # exclusions by path
-        # "exclude_filepaths": [
-        #     r"C:/Users/cppmo_000/AppData/Roaming",
-        # ]
-
     },
 
     {
         "name": "jake_backup",
-        "source_dir": r"",
-        "dest_dir": r"",
+        "source_dir": "",
+        "dest_dir": "",
         "exclude_dirs": [
-            r"C:/Users/cppmo_000/Dropbox",
-            r"C:/Users/cppmo_000/AppData/Roaming/Apple Computer/MobileSync",
-            r"C:/Users/cppmo_000/Music/iTunes",
-            r"C:/Users/cppmo_000/Documents/AndroidStudioProjects",
-            r"C:/Users/cppmo_000/Documents/Battlefield 4",
-            r"C:/Users/cppmo_000/Documents/creeperworld3",
-            r"C:/Users/cppmo_000/Documents/Dolphin Emulator",
-            r"C:/Users/cppmo_000/Documents/Dungeon of the Endless",
-            r"C:/Users/cppmo_000/Documents/Electronic Arts",
-            r"C:/Users/cppmo_000/Documents/Games for Windows - LIVE Demos",
-            r"C:/Users/cppmo_000/Documents/Heroes of the Storm",
-            r"C:/Users/cppmo_000/Documents/League of Legends",
-            r"C:/Users/cppmo_000/Documents/my games/Tabletop Simulator",
-            r"C:/Users/cppmo_000/Documents/PoE-TradeMacro",
-            r"C:/Users/cppmo_000/Documents/SEGA",
-            r"C:/Users/cppmo_000/Documents/UnrealTournament",
-            r"C:/Users/cppmo_000/Documents/WB Games",
+            "C:/Users/cppmo_000/Dropbox",
+            "C:/Users/cppmo_000/AppData/Roaming/Apple Computer/MobileSync",
+            "C:/Users/cppmo_000/Music/iTunes",
+            "C:/Users/cppmo_000/Documents/AndroidStudioProjects",
+            "C:/Users/cppmo_000/Documents/Battlefield 4",
+            "C:/Users/cppmo_000/Documents/creeperworld3",
+            "C:/Users/cppmo_000/Documents/Dolphin Emulator",
+            "C:/Users/cppmo_000/Documents/Dungeon of the Endless",
+            "C:/Users/cppmo_000/Documents/Electronic Arts",
+            "C:/Users/cppmo_000/Documents/Games for Windows - LIVE Demos",
+            "C:/Users/cppmo_000/Documents/Heroes of the Storm",
+            "C:/Users/cppmo_000/Documents/League of Legends",
+            "C:/Users/cppmo_000/Documents/my games/Tabletop Simulator",
+            "C:/Users/cppmo_000/Documents/PoE-TradeMacro",
+            "C:/Users/cppmo_000/Documents/SEGA",
+            "C:/Users/cppmo_000/Documents/UnrealTournament",
+            "C:/Users/cppmo_000/Documents/WB Games",
+            "C:\Users/cppmo_000/Documents/my games",
         ],
         # exclude globs / regex
         "exclude_files_globs": [
-            {"sys files": "*.sys"},
+            # {"sys files": "*.sys"},
         ],
         # global excludes ignoring paths
         "exclude_files": [
