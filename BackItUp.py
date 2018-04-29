@@ -16,7 +16,7 @@ from app.app_locals import (
     print_drive_usage,
 )
 
-WHATIF = True
+WHATIF = False
 STATS = {} # defaults defined in _reset_stats()
 logging.basicConfig(
     filename=os.path.join("logs", "main.log"),

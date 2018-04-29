@@ -4,7 +4,11 @@ import logging
 
 def valid_path(path):
     if not path:
-        return False
+        raise ValueError("Path given is empty")
+    if os.path.isdir(path):
+        return True
+
+    os.makedirs(path)
     return os.path.isdir(path)
 
 def files_are_same(full_path_source, full_path_dest):
