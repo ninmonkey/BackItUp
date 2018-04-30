@@ -30,9 +30,13 @@ STATS = {
 }
 
 DISABLE_CONSOLE_IO = False # todo: test for speed
+# logging.basicConfig(
+#     filename=os.path.join("logs", "main.log"),
+#     filemode='w', level=logging.DEBUG)
+
 logging.basicConfig(
-    filename=os.path.join("logs", "main.log"),
-    filemode='w', level=logging.INFO)
+    handlers=[logging.FileHandler(os.path.join("logs", "main.log"), 'w', 'utf-8')],
+    level=logging.DEBUG)
 
 
 def _reset_stats():
@@ -67,7 +71,7 @@ def print_stats(stats):
         time_secs = stats["backup_end"] - stats["backup_start"],
     )
     logging.info("\n{}\n".format(msg))
-    print(msg)
+    # print(msg)
 
 def walk_entry(app_config): # todo: only arg be config?
     # logic entry point
@@ -94,8 +98,8 @@ def walk_entry(app_config): # todo: only arg be config?
         # blacklist 1. hardcoded filenames
         for file in files[:]:
             if file in app_config["exclude_files"]:
-                print("{}".format(os.path.join(root, file)))
-                print("\tskipping: ", file)
+                logging.debug("{}".format(os.path.join(root, file)))
+                logging.debug("\tskipping: {}".format(file))
                 files.remove(file)
 
         # todo: blacklist 2. glob/regex filenames
@@ -156,21 +160,21 @@ def walk_entry(app_config): # todo: only arg be config?
             logging.debug(msg)
 
             if WHATIF:
-                print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
+                # print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
                 continue
 
             if not files_are_same(full_path_source, full_path_dest):
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
-                if not DISABLE_CONSOLE_IO:
-                    print(".", end='')# flush=True
+                # if not DISABLE_CONSOLE_IO:
+                #     print(".", end='')# flush=True
 
                 STATS["copied_total_bytes"] += size
                 STATS["copied_filecount"] += 1
             else:
                 STATS["skipped_total_bytes"] += size
 
-        for cur_dir in dirs:
+        for cur_dir in dirs[:]:
             full_dir_path = os.path.join(root, cur_dir)
 
             # blacklist 3. fullpath dirs
