@@ -2,14 +2,16 @@ import os
 import shutil
 import logging
 
-def valid_path(path):
+def valid_path(path, create=True):
     if not path:
         raise ValueError("Path given is empty")
     if os.path.isdir(path):
         return True
+    if create:
+        os.makedirs(path, exist_ok=True)
 
-    os.makedirs(path, exist_ok=True)
     return os.path.isdir(path)
+
 
 def files_are_same(full_path_source, full_path_dest):
     """
@@ -27,11 +29,9 @@ def files_are_same(full_path_source, full_path_dest):
     filename_dest = os.path.basename(full_path_dest)
 
     if size_source != size_dest:
-        # logging.debug("size_source != size_dest")
         return False
 
     if filename_source != filename_dest:
-        # logging.debug("filename_source != filename_dest")
         return False
 
     logging.debug("files_are_same(): {},\nfor source: {}\nfor dest: {}".format(
@@ -42,6 +42,7 @@ def files_are_same(full_path_source, full_path_dest):
 
     return True
 
+
 def humanize_bytes(num_bytes, suffix='B'):
     # convert byte count to human readable units
     num = num_bytes
@@ -50,6 +51,7 @@ def humanize_bytes(num_bytes, suffix='B'):
             return "{num:.1f}{unit}{suffix}".format(num=num, unit=unit, suffix=suffix)
         num /= 1024.0
     return "{num:.1f}{unit}{suffix}".format(num=num, unit='Yi', suffix=suffix)
+
 
 def print_drive_usage(drive="c:/"):
     # usage stats

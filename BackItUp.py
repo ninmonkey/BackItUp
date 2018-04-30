@@ -17,8 +17,18 @@ from app.app_locals import (
 import app
 from app import config
 
-WHATIF = True
-STATS = {} # defaults defined in _reset_stats()
+WHATIF = True   # if True, disables writing
+STATS = {
+    "source_total_bytes": 0,
+    "source_total_bytes": 0, # number of bytes read from source
+    "copied_total_bytes": 0, # number of bytes written to dest
+    "skipped_total_bytes": 0,# bytes 'skipped' when file is already existing
+    "source_filecount": 0,   # numbers of source files parsed
+    "copied_filecount": 0,   # number of files copied (not skipped)
+    "backup_start": 0,       # seconds
+    "backup_end": 0,
+}
+
 DISABLE_CONSOLE_IO = False # todo: test for speed
 logging.basicConfig(
     filename=os.path.join("logs", "main.log"),
@@ -39,7 +49,7 @@ def print_config():
     # logging.log("JSON config")
     raise NotImplementedError("convert config.py to pretty JSON?")
 
-def print_stats():
+def print_stats(stats):
     msg = (
         "\nStats"
         "\ntotal size of source = {source_total_bytes}"
@@ -49,12 +59,12 @@ def print_stats():
         "\ntotal files in copied = {copied_filecount}"
         "\nTime taken (in seconds) {time_secs:.3f}"
     ).format(
-        source_total_bytes=humanize_bytes(STATS['source_total_bytes']),
-        copied_total_bytes=humanize_bytes(STATS['copied_total_bytes']),
-        skipped_total_bytes=humanize_bytes(STATS['skipped_total_bytes']),
-        source_filecount = STATS['source_filecount'],
-        copied_filecount = STATS['copied_filecount'],
-        time_secs = STATS["backup_end"] - STATS["backup_start"],
+        source_total_bytes=humanize_bytes(stats['source_total_bytes']),
+        copied_total_bytes=humanize_bytes(stats['copied_total_bytes']),
+        skipped_total_bytes=humanize_bytes(stats['skipped_total_bytes']),
+        source_filecount = stats['source_filecount'],
+        copied_filecount = stats['copied_filecount'],
+        time_secs = stats["backup_end"] - stats["backup_start"],
     )
     logging.info("\n{}".format(msg))
     print(msg)
@@ -152,6 +162,9 @@ def walk_entry(app_config): # todo: only arg be config?
             if not files_are_same(full_path_source, full_path_dest):
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
+                if not DISABLE_CONSOLE_IO:
+                    print(".", end='')# flush=True
+
                 STATS["copied_total_bytes"] += size
                 STATS["copied_filecount"] += 1
             else:
@@ -184,7 +197,7 @@ def run(config_name):
     print_drive_usage(app_config["source_dir"])
     print_drive_usage(app_config["dest_dir"])
     walk_entry(app_config)
-    print_stats()
+    print_stats(STATS)
     print("{config_name} Done.".format(config_name=config_name))
 
 if __name__ == "__main__":
