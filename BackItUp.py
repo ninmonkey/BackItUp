@@ -1,5 +1,3 @@
-import app
-
 from os.path import getsize, join
 import logging
 import logging
@@ -16,8 +14,12 @@ from app.app_locals import (
     print_drive_usage,
 )
 
-WHATIF = False
+import app
+from app import config
+
+WHATIF = True
 STATS = {} # defaults defined in _reset_stats()
+DISABLE_CONSOLE_IO = False # todo: test for speed
 logging.basicConfig(
     filename=os.path.join("logs", "main.log"),
     filemode='w', level=logging.DEBUG)
@@ -57,12 +59,10 @@ def print_stats():
     logging.info("\n{}".format(msg))
     print(msg)
 
-def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
+def walk_entry(app_config): # todo: only arg be config?
     # logic entry point
-    if not source_root:
-        source_root = app_config['source_dir']
-    if not dest_root:
-        dest_root = app_config['dest_dir']
+    source_root = app_config['source_dir']
+    dest_root = app_config['dest_dir']
 
     _reset_stats()
     STATS["backup_start"] = time.time()
@@ -172,28 +172,25 @@ def walk_entry(source_root=None, dest_root=None): # todo: only arg be config?
                     dirs.remove(cur_dir)
                     continue
 
-            try:
-                os.makedirs(full_dir_path)
-            except FileExistsError: # wait do I want this? obsolete requirement?
-                pass
+            os.makedirs(full_dir_path, exist_ok=True)
 
     STATS["backup_end"] = time.time()
 
-if __name__ == "__main__":
-    from app import config
-    app_config = config.load_config("debug")
-    # app_config = load_config("jake_backup")
-
+def run(config_name):
+    app_config = config.load_config(config_name)
     logging.info("Config name = {}".format(app_config['name']))
+
     print("WhatIf mode: {}".format(WHATIF))
     print_drive_usage(app_config["source_dir"])
-    # print_drive_usage(app_config["dest_dir"])
-    print_drive_usage(r"D:\temp_backup_test")
-
-    # walk_entry()
-    walk_entry(app_config["source_dir"], app_config["dest_dir"])
-    # walk_entry(app_config["source_dir"], r"D:\temp_backup_test")
-
+    print_drive_usage(app_config["dest_dir"])
+    walk_entry(app_config)
     print_stats()
+    print("{config_name} Done.".format(config_name=config_name))
+
+if __name__ == "__main__":
+
+    run("debug")
+    # run("jake_backup 2018")
+
     print("\nDone.")
 

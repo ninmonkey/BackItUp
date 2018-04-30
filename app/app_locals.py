@@ -8,7 +8,7 @@ def valid_path(path):
     if os.path.isdir(path):
         return True
 
-    os.makedirs(path)
+    os.makedirs(path, exist_ok=True)
     return os.path.isdir(path)
 
 def files_are_same(full_path_source, full_path_dest):
@@ -43,7 +43,7 @@ def files_are_same(full_path_source, full_path_dest):
     return True
 
 def humanize_bytes(num_bytes, suffix='B'):
-    # convert bytes to human readable unit
+    # convert byte count to human readable units
     num = num_bytes
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
         if abs(num) < 1024.0:

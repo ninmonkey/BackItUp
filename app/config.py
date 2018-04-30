@@ -29,12 +29,13 @@ app_config_all = [
     },
 
     {
-        "name": "jake_backup",
-        "source_dir": "",
-        "dest_dir": "",
+        "name": "jake_backup 2018",
+        "source_dir": "C:/Users/cppmo_000",
+        "dest_dir": "D:/backup_2018 automatic nin.BackItUp",
         "exclude_dirs": [
             "C:/$Recycle.Bin",
             "C:/Users/cppmo_000/AppData/Roaming/Apple Computer",
+            "C:/Users/cppmo_000/Desktop",
             "C:/Users/cppmo_000/AppData",
             "C:/Users/cppmo_000/Dropbox",
             "C:/Users/cppmo_000/AppData/Roaming/Apple Computer/MobileSync",
@@ -72,6 +73,7 @@ app_config_all = [
 
 ]
 
+
 def validate_config(config, strict=True):
     # basic validate config file, check directories
     if not config:
@@ -87,16 +89,18 @@ def validate_config(config, strict=True):
     if strict:
         for dir in config["exclude_dirs"]:
             if not os.path.isdir(dir):
-                print("E".format(dir))
+                print("{}".format(dir))
                 raise ValueError("Might be a typo. Path doesn't exist: {}".format(dir))
 
     return True
+
 
 def load_config(name):
     for config in app_config_all:
         if config["name"] == name:
             validate_config(config)
             return config
+
     raise ValueError("Unknowing config name = {}".format(name))
 
 
