@@ -32,7 +32,7 @@ STATS = {
 DISABLE_CONSOLE_IO = False # todo: test for speed
 logging.basicConfig(
     filename=os.path.join("logs", "main.log"),
-    filemode='w', level=logging.DEBUG)
+    filemode='w', level=logging.INFO)
 
 
 def _reset_stats():
@@ -66,7 +66,7 @@ def print_stats(stats):
         copied_filecount = stats['copied_filecount'],
         time_secs = stats["backup_end"] - stats["backup_start"],
     )
-    logging.info("\n{}".format(msg))
+    logging.info("\n{}\n".format(msg))
     print(msg)
 
 def walk_entry(app_config): # todo: only arg be config?
@@ -180,12 +180,13 @@ def walk_entry(app_config): # todo: only arg be config?
 
                 # if full_dir_path == path: # this failed when mixed slashes for/back
                 if os.path.normpath(full_dir_path) == os.path.normpath(path):
-                    print("Skipping blacklisted directory = {}".format(path))
-                    logging.info("Skipping blacklisted directory = {}".format(path))
+                    # print("Skipping blacklisted directory = {}".format(path))
+                    logging.debug("Skipping blacklisted directory = {}".format(path))
                     dirs.remove(cur_dir)
                     continue
 
-            os.makedirs(full_dir_path, exist_ok=True)
+            if not os.path.isdir(full_dir_path):
+                os.makedirs(full_dir_path)
 
     STATS["backup_end"] = time.time()
 
@@ -203,7 +204,7 @@ def run(config_name):
 if __name__ == "__main__":
 
     run("debug")
-    # run("jake_backup 2018")
+    run("jake_backup 2018")
 
     print("\nDone.")
 
