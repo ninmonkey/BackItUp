@@ -48,9 +48,9 @@ def humanize_bytes(num_bytes, suffix='B'):
     num = num_bytes
     for unit in ['','Ki','Mi','Gi','Ti','Pi','Ei','Zi']:
         if abs(num) < 1024.0:
-            return "{num:.1f}{unit}{suffix}".format(num=num, unit=unit, suffix=suffix)
+            return "{num:.2f}{unit}{suffix}".format(num=num, unit=unit, suffix=suffix)
         num /= 1024.0
-    return "{num:.1f}{unit}{suffix}".format(num=num, unit='Yi', suffix=suffix)
+    return "{num:.2f}{unit}{suffix}".format(num=num, unit='Yi', suffix=suffix)
 
 
 def print_drive_usage(drive="c:/"):
