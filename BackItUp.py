@@ -17,6 +17,7 @@ from app.app_locals import (
 import app
 from app import config
 
+NTFS_LENGTH_LIMIT = 255
 DISABLE_CONSOLE_IO = True # todo: test for speed
 WHATIF = False   # if True, disables writing
 STATS = {
@@ -29,6 +30,7 @@ STATS = {
     "source_total_bytes": 0,
     "source_total_bytes": 0, # number of bytes read from source
 }
+MISSED_FILES = []
 
 # logging.basicConfig(
 #     filename=os.path.join("logs", "main.log"),
@@ -48,13 +50,14 @@ def _reset_stats():
     STATS["source_filecount"] = 0   # numbers of source files parsed
     STATS["source_total_bytes"] = 0 # number of bytes read from source
     # STATS["files_blacklisted"] = 0  # blacklist counter
+    MISSED_FILES = []
 
 def print_config():
     # logging.log("JSON config")
     raise NotImplementedError("convert config.py to pretty JSON?")
 
 def print_stats(stats):
-    msg = (
+    msg_stats = (
         "\nStats"
         "\ntotal size of source = {source_total_bytes}"
         "\ntotal size (actually) copied from source = {copied_total_bytes}"
@@ -70,8 +73,16 @@ def print_stats(stats):
         copied_filecount = stats['copied_filecount'],
         time_secs = stats["backup_end"] - stats["backup_start"],
     )
-    logging.info("\n{}\n".format(msg))
+
+    msg = "Missing files from (>= 260) limit:"
+    for file in MISSED_FILES:
+        msg += "\nfile: {}".format(file)
+    msg += "\nMissing {} files".format(len(MISSED_FILES))
+    logging.warning("\n{}\n".format(msg))
     print(msg)
+
+    logging.info("\n{}\n".format(msg_stats))
+    print(msg_stats)
 
 def walk_entry(app_config): # todo: only arg be config?
     # logic entry point
@@ -108,10 +119,11 @@ def walk_entry(app_config): # todo: only arg be config?
         # good files to copy
         for file in files:
             full_path_source = os.path.normpath(os.path.join(root, file))
-            if len(full_path_source) >= 260:
+            if len(full_path_source) >= NTFS_LENGTH_LIMIT:
                 msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_source)
                 logging.error(msg)
                 print(msg)
+                MISSED_FILES.append(full_path_source)
 
                 continue
 
@@ -154,9 +166,8 @@ def walk_entry(app_config): # todo: only arg be config?
                 full_dir=full_path_dest_dir,
             )
             logging.debug(msg)
-            if not DISABLE_CONSOLE_IO:
+            # if not DISABLE_CONSOLE_IO:
                 # print(msg)
-                pass
 
             if WHATIF:
                 # print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
@@ -164,25 +175,21 @@ def walk_entry(app_config): # todo: only arg be config?
 
             if not files_are_same(full_path_source, full_path_dest):
 
-                # if len(full_path_dest_dir) >= 260:
-                #     msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_dest_dir)
-                #     logging.error(msg)
-                #     print(msg)
-                #     continue
-
-                if len(full_path_source) >= 260 or len(full_path_dest) >= 260:
-                    msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_source)
+                if len(full_path_dest) >= NTFS_LENGTH_LIMIT or len(full_path_dest_dir) >= NTFS_LENGTH_LIMIT:
+                    msg = "Could not backup filepath with length >= 260 for full_path_dest:\n\t{})".format(full_path_dest)
                     logging.error(msg)
                     print(msg)
+                    MISSED_FILES.append(full_path_source)
                     continue
 
+                # if full_path_dest_dir == "D:\\backup_2018 automatic nin.BackItUp\\.gradle\\caches\\2.2.1\\scripts\\asLocalRepo1565470307841526719_bqvpis3d6e1pxv0ur2vf6ycam\\InitScript\\no_initscript\\classes":
+                #     print("^"*100)
+                #     print("src: ", len(full_path_source))
+                #     print("dest file: ", len(full_path_dest))
+                #     print("dest dir: ", len(full_path_dest_dir))
+                #     continue
 
-                if full_path_dest_dir == "D:\\backup_2018 automatic nin.BackItUp\\.gradle\\caches\\2.2.1\\scripts\\asLocalRepo1565470307841526719_bqvpis3d6e1pxv0ur2vf6ycam\\InitScript\\no_initscript\\classes":
-                    print("^"*100)
-                    print("src: ", len(full_path_source))
-                    print("dest file: ", len(full_path_dest))
-                    print("dest dir: ", len(full_path_dest_dir))
-                    continue
+                # print("len: ", len(full_path_dest_dir))
 
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
