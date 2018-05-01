@@ -39,10 +39,14 @@ app_config_all = [
     {
         "name": "jake_backup 2018",
         "source_dir": "C:/Users/cppmo_000",
+        # "source_dir": "C:/Users/cppmo_000/.gradle",
+        # "source_dir": "C:/Users/cppmo_000/Documents/0x7df/GitHub",
         "dest_dir": "D:/backup_2018 automatic nin.BackItUp",
         "exclude_dirs": [
             "C:/$Recycle.Bin",
+            # "C:/Users/cppmo_000/.gradle",
             "C:/Users/cppmo_000/3D Objects",
+            "C:/Users/cppmo_000/",
             "C:/Users/cppmo_000/AppData",
             "C:/Users/cppmo_000/AppData/Local/Microsoft",
             "C:/Users/cppmo_000/AppData/Roaming/Apple Computer",

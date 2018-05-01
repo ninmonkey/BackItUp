@@ -17,36 +17,36 @@ from app.app_locals import (
 import app
 from app import config
 
-WHATIF = True   # if True, disables writing
+DISABLE_CONSOLE_IO = True # todo: test for speed
+WHATIF = False   # if True, disables writing
 STATS = {
-    "source_total_bytes": 0,
-    "source_total_bytes": 0, # number of bytes read from source
+    "backup_end": 0,
+    "backup_start": 0,       # seconds
+    "copied_filecount": 0,   # number of files copied (not skipped)
     "copied_total_bytes": 0, # number of bytes written to dest
     "skipped_total_bytes": 0,# bytes 'skipped' when file is already existing
     "source_filecount": 0,   # numbers of source files parsed
-    "copied_filecount": 0,   # number of files copied (not skipped)
-    "backup_start": 0,       # seconds
-    "backup_end": 0,
+    "source_total_bytes": 0,
+    "source_total_bytes": 0, # number of bytes read from source
 }
 
-DISABLE_CONSOLE_IO = False # todo: test for speed
 # logging.basicConfig(
 #     filename=os.path.join("logs", "main.log"),
 #     filemode='w', level=logging.DEBUG)
 
 logging.basicConfig(
     handlers=[logging.FileHandler(os.path.join("logs", "main.log"), 'w', 'utf-8')],
-    level=logging.INFO)
+    level=logging.DEBUG)
 
 
 def _reset_stats():
-    STATS["source_total_bytes"] = 0 # number of bytes read from source
+    STATS["backup_end"] = 0         # seconds
+    STATS["backup_start"] = 0       # seconds
+    STATS["copied_filecount"] = 0   # number of files copied (not skipped)
     STATS["copied_total_bytes"] = 0 # number of bytes written to dest
     STATS["skipped_total_bytes"] = 0# bytes 'skipped' when file is already existing
     STATS["source_filecount"] = 0   # numbers of source files parsed
-    STATS["copied_filecount"] = 0   # number of files copied (not skipped)
-    STATS["backup_start"] = 0       # seconds
-    STATS["backup_end"] = 0         # seconds
+    STATS["source_total_bytes"] = 0 # number of bytes read from source
     # STATS["files_blacklisted"] = 0  # blacklist counter
 
 def print_config():
@@ -111,17 +111,16 @@ def walk_entry(app_config): # todo: only arg be config?
             if len(full_path_source) >= 260:
                 msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_source)
                 logging.error(msg)
-                if not DISABLE_CONSOLE_IO:
-                    print(msg)
+                print(msg)
 
                 continue
 
             size = os.path.getsize(full_path_source)
-            full_path_dest = os.path.join(
+            full_path_dest = os.path.normpath(os.path.join(
                 dest_root,
                 os.path.relpath(root, source_root),
                 file,
-            )
+            ))
 
             STATS['source_total_bytes'] += size
 
@@ -164,15 +163,39 @@ def walk_entry(app_config): # todo: only arg be config?
                 continue
 
             if not files_are_same(full_path_source, full_path_dest):
+
+                # if len(full_path_dest_dir) >= 260:
+                #     msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_dest_dir)
+                #     logging.error(msg)
+                #     print(msg)
+                #     continue
+
+                if len(full_path_source) >= 260 or len(full_path_dest) >= 260:
+                    msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_source)
+                    logging.error(msg)
+                    print(msg)
+                    continue
+
+
+                if full_path_dest_dir == "D:\\backup_2018 automatic nin.BackItUp\\.gradle\\caches\\2.2.1\\scripts\\asLocalRepo1565470307841526719_bqvpis3d6e1pxv0ur2vf6ycam\\InitScript\\no_initscript\\classes":
+                    print("^"*100)
+                    print("src: ", len(full_path_source))
+                    print("dest file: ", len(full_path_dest))
+                    print("dest dir: ", len(full_path_dest_dir))
+                    continue
+
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
-                if not DISABLE_CONSOLE_IO:
-                    print(".", end='')# flush=True
+                # if not DISABLE_CONSOLE_IO:
+                print("+", end='', flush=True)# flush=True
 
                 STATS["copied_total_bytes"] += size
                 STATS["copied_filecount"] += 1
             else:
                 STATS["skipped_total_bytes"] += size
+
+                # if not DISABLE_CONSOLE_IO:
+                print(".", end='', flush=True)# flush=True
 
         for cur_dir in dirs[:]:
             full_dir_path = os.path.join(root, cur_dir)
@@ -196,7 +219,9 @@ def walk_entry(app_config): # todo: only arg be config?
 
 def run(config_name):
     app_config = config.load_config(config_name)
-    logging.info("Config name = {}".format(app_config['name']))
+    msg = "Config name = {}".format(app_config['name'])
+    print(msg)
+    logging.info(msg)
 
     print("WhatIf mode: {}".format(WHATIF))
     print_drive_usage(app_config["source_dir"])
