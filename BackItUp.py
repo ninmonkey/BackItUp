@@ -36,7 +36,7 @@ DISABLE_CONSOLE_IO = False # todo: test for speed
 
 logging.basicConfig(
     handlers=[logging.FileHandler(os.path.join("logs", "main.log"), 'w', 'utf-8')],
-    level=logging.DEBUG)
+    level=logging.INFO)
 
 
 def _reset_stats():
@@ -71,7 +71,7 @@ def print_stats(stats):
         time_secs = stats["backup_end"] - stats["backup_start"],
     )
     logging.info("\n{}\n".format(msg))
-    # print(msg)
+    print(msg)
 
 def walk_entry(app_config): # todo: only arg be config?
     # logic entry point
@@ -95,44 +95,27 @@ def walk_entry(app_config): # todo: only arg be config?
 
         STATS["source_filecount"] += 1
 
-        # blacklist 1. hardcoded filenames
+        # blacklist
         for file in files[:]:
+            # 1. hardcoded filenames
             if file in app_config["exclude_files"]:
                 logging.debug("{}".format(os.path.join(root, file)))
                 logging.debug("\tskipping: {}".format(file))
                 files.remove(file)
 
-        # todo: blacklist 2. glob/regex filenames
-
-        # first try:
-        #     if fnmatch.fnmatch(file, '*.txt'):
-
-        # for file in files[:]:
-        #     path = os.path.join(root, file)
-        #     print("File = {}".format(path))
-        #     for pattern in app_config["exclude_files_globs"]:
-        #         print(pattern)
-
-        # pattern = os.path.join(root, pattern)
-        # print(glob("c*/*.pyc"))
-        # if file in glob("*.pyc"):
-        #     print("\tskip glob: ", file)
-
-
-        # for file in files[:]:
-        #     for pattern in app_config["exclude_files_globs"]:
-        #         pattern = os.path.join(root, pattern)
-        #         print(pattern)
-        #         if file in glob(pattern):
-        #             print("\tskip glob: ", file)
-
-                # print("{}".format(os.path.join(root, file)))
-                # files.remove(file)
-
+            # todo: blacklist 2. /regex filenames
 
         # good files to copy
         for file in files:
-            full_path_source = os.path.join(root, file)
+            full_path_source = os.path.normpath(os.path.join(root, file))
+            if len(full_path_source) >= 260:
+                msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_source)
+                logging.error(msg)
+                if not DISABLE_CONSOLE_IO:
+                    print(msg)
+
+                continue
+
             size = os.path.getsize(full_path_source)
             full_path_dest = os.path.join(
                 dest_root,
@@ -158,6 +141,23 @@ def walk_entry(app_config): # todo: only arg be config?
                 full_path_dest_dir=full_path_dest_dir,
             )
             logging.debug(msg)
+            if not DISABLE_CONSOLE_IO:
+                print(msg)
+
+            msg = (
+                "\nfull path  srd: {full_src}"
+                "\nfull path dest: {full_dest}"
+                "\nfull path dest_dir: {full_dir}"
+                "\n"
+            ).format(
+                full_src=full_path_source,
+                full_dest=full_path_dest,
+                full_dir=full_path_dest_dir,
+            )
+            logging.debug(msg)
+            if not DISABLE_CONSOLE_IO:
+                # print(msg)
+                pass
 
             if WHATIF:
                 # print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
@@ -166,8 +166,8 @@ def walk_entry(app_config): # todo: only arg be config?
             if not files_are_same(full_path_source, full_path_dest):
                 os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
-                # if not DISABLE_CONSOLE_IO:
-                #     print(".", end='')# flush=True
+                if not DISABLE_CONSOLE_IO:
+                    print(".", end='')# flush=True
 
                 STATS["copied_total_bytes"] += size
                 STATS["copied_filecount"] += 1
@@ -207,7 +207,7 @@ def run(config_name):
 
 if __name__ == "__main__":
 
-    run("debug")
+    # run("debug")
     run("jake_backup 2018")
 
     print("\nDone.")
