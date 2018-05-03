@@ -6,18 +6,12 @@ app_config = None
 app_config_all = [
     {
         "name": "debug",
-        "source_dir": "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data",
-        "dest_dir": "C:/Users/cppmo_000/Documents/2018/BackItUp/test_output_data",
+        "source_dir": "C:/Users/cppmo_000/PycharmProjects/BackItUp/test_input_data",
+        "dest_dir": "C:/Users/cppmo_000/PycharmProjects/BackItUp/test_output_data",
 
         "exclude_dirs": [
-            "C:/Users/cppmo_000/Documents/2018/BackItUp/test_input_data/a/skip_me",
+            "C:/Users/cppmo_000/PycharmProjects/BackItUp/test_input_data/a/skip_me",
         ],
-        # "exclude_files_globs": [
-        #     "*.pyc",        # todo
-        #     "pagefile.sys",
-        #     "swapfile.sys",
-        #     "hiberfil.sys",
-        # ],
 
         # global excludes ignoring paths
         "exclude_files": [
@@ -66,11 +60,6 @@ app_config_all = [
             "C:/Users/cppmo_000/Dropbox",
             "C:/Users/cppmo_000/Music/iTunes",
         ],
-        # # exclude globs / regex
-        # "exclude_files_globs": [
-        #     # {"sys files": "*.sys"},
-        # ],
-
 
         # global excludes ignoring paths
         "exclude_files": [

@@ -125,24 +125,12 @@ def walk_entry(app_config): # todo: only arg be config?
             ))
 
             if len(full_path_source) >= NTFS_LENGTH_LIMIT:
-                # msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{0}\n\tlen={1})".format(full_path_source, len(full_path_source))
-                # logging.error(msg)
-                # print(msg)
-                # print("len=", len(full_path_source))
-                # MISSED_FILES.append(full_path_source)
                 full_path_source = "\\\\?\\" + full_path_source
                 full_path_dest = "\\\\?\\" + full_path_dest
 
 
             size = os.path.getsize(full_path_source)
-            # size = 1
-
             STATS['source_total_bytes'] += size
-
-            # msg = (
-            #     "{name} size = {size}"
-            # ).format(name=file, size=humanize_bytes(size))
-            # logging.debug(msg)
 
             full_path_dest_dir = os.path.dirname(full_path_dest)
 
@@ -169,32 +157,13 @@ def walk_entry(app_config): # todo: only arg be config?
                 full_dir=full_path_dest_dir,
             )
             logging.debug(msg)
-            # if not DISABLE_CONSOLE_IO:
-                # print(msg)
 
             if WHATIF:
                 # print("WhatIf: copy file \n\tfrom = {} \n\t to = {}".format(full_path_source, full_path_dest))
                 continue
 
+            os.makedirs(full_path_dest_dir, exist_ok=True)
             if not files_are_same(full_path_source, full_path_dest):
-
-                # if len(full_path_dest) >= NTFS_LENGTH_LIMIT or len(full_path_dest_dir) >= NTFS_LENGTH_LIMIT:
-                #     msg = "Could not backup filepath with length >= 260 for full_path_dest:\n\t{})".format(full_path_dest)
-                #     logging.error(msg)
-                #     print(msg)
-                #     MISSED_FILES.append(full_path_source)
-                #     continue
-
-                # if full_path_dest_dir == "D:\\backup_2018 automatic nin.BackItUp\\.gradle\\caches\\2.2.1\\scripts\\asLocalRepo1565470307841526719_bqvpis3d6e1pxv0ur2vf6ycam\\InitScript\\no_initscript\\classes":
-                #     print("^"*100)
-                #     print("src: ", len(full_path_source))
-                #     print("dest file: ", len(full_path_dest))
-                #     print("dest dir: ", len(full_path_dest_dir))
-                #     continue
-
-                # print("len: ", len(full_path_dest_dir))
-
-                os.makedirs(full_path_dest_dir, exist_ok=True)
                 shutil.copy2(full_path_source, full_path_dest_dir)
                 # if not DISABLE_CONSOLE_IO:
                 print("+", end='', flush=True)# flush=True
