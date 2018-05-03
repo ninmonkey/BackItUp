@@ -17,7 +17,7 @@ from app.app_locals import (
 import app
 from app import config
 
-NTFS_LENGTH_LIMIT = 255
+NTFS_LENGTH_LIMIT = 260
 DISABLE_CONSOLE_IO = True # todo: test for speed
 WHATIF = False   # if True, disables writing
 STATS = {
@@ -27,7 +27,6 @@ STATS = {
     "copied_total_bytes": 0, # number of bytes written to dest
     "skipped_total_bytes": 0,# bytes 'skipped' when file is already existing
     "source_filecount": 0,   # numbers of source files parsed
-    "source_total_bytes": 0,
     "source_total_bytes": 0, # number of bytes read from source
 }
 MISSED_FILES = []
@@ -119,20 +118,24 @@ def walk_entry(app_config): # todo: only arg be config?
         # good files to copy
         for file in files:
             full_path_source = os.path.normpath(os.path.join(root, file))
-            if len(full_path_source) >= NTFS_LENGTH_LIMIT:
-                msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{})".format(full_path_source)
-                logging.error(msg)
-                print(msg)
-                MISSED_FILES.append(full_path_source)
-
-                continue
-
-            size = os.path.getsize(full_path_source)
             full_path_dest = os.path.normpath(os.path.join(
                 dest_root,
                 os.path.relpath(root, source_root),
                 file,
             ))
+
+            if len(full_path_source) >= NTFS_LENGTH_LIMIT:
+                # msg = "Could not backup filepath with length >= 260 for full_path_source:\n\t{0}\n\tlen={1})".format(full_path_source, len(full_path_source))
+                # logging.error(msg)
+                # print(msg)
+                # print("len=", len(full_path_source))
+                # MISSED_FILES.append(full_path_source)
+                full_path_source = "\\\\?\\" + full_path_source
+                full_path_dest = "\\\\?\\" + full_path_dest
+
+
+            size = os.path.getsize(full_path_source)
+            # size = 1
 
             STATS['source_total_bytes'] += size
 
@@ -175,12 +178,12 @@ def walk_entry(app_config): # todo: only arg be config?
 
             if not files_are_same(full_path_source, full_path_dest):
 
-                if len(full_path_dest) >= NTFS_LENGTH_LIMIT or len(full_path_dest_dir) >= NTFS_LENGTH_LIMIT:
-                    msg = "Could not backup filepath with length >= 260 for full_path_dest:\n\t{})".format(full_path_dest)
-                    logging.error(msg)
-                    print(msg)
-                    MISSED_FILES.append(full_path_source)
-                    continue
+                # if len(full_path_dest) >= NTFS_LENGTH_LIMIT or len(full_path_dest_dir) >= NTFS_LENGTH_LIMIT:
+                #     msg = "Could not backup filepath with length >= 260 for full_path_dest:\n\t{})".format(full_path_dest)
+                #     logging.error(msg)
+                #     print(msg)
+                #     MISSED_FILES.append(full_path_source)
+                #     continue
 
                 # if full_path_dest_dir == "D:\\backup_2018 automatic nin.BackItUp\\.gradle\\caches\\2.2.1\\scripts\\asLocalRepo1565470307841526719_bqvpis3d6e1pxv0ur2vf6ycam\\InitScript\\no_initscript\\classes":
                 #     print("^"*100)
@@ -202,7 +205,7 @@ def walk_entry(app_config): # todo: only arg be config?
                 STATS["skipped_total_bytes"] += size
 
                 # if not DISABLE_CONSOLE_IO:
-                print(".", end='', flush=True)# flush=True
+                # print(".", end='', flush=True)# flush=True
 
         for cur_dir in dirs[:]:
             full_dir_path = os.path.join(root, cur_dir)
@@ -235,12 +238,12 @@ def run(config_name):
     print_drive_usage(app_config["dest_dir"])
     walk_entry(app_config)
     print_stats(STATS)
-    print("{config_name} Done.".format(config_name=config_name))
+    print("Done: config = {config_name}".format(config_name=config_name))
 
 if __name__ == "__main__":
 
-    # run("debug")
-    run("jake_backup 2018")
+    run("debug")
+    # run("jake_backup 2018")
 
     print("\nDone.")
 
