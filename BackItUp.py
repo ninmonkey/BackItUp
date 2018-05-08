@@ -17,23 +17,20 @@ from app.app_locals import (
 import app
 from app import config
 
+USING_WINDOWS = True
 NTFS_LENGTH_LIMIT = 260
-DISABLE_CONSOLE_IO = True # todo: test for speed
+DISABLE_CONSOLE_IO = False
 WHATIF = False   # if True, disables writing
 STATS = {
     "backup_end": 0,
     "backup_start": 0,       # seconds
     "copied_filecount": 0,   # number of files copied (not skipped)
-    "copied_total_bytes": 0, # number of bytes written to dest
-    "skipped_total_bytes": 0,# bytes 'skipped' when file is already existing
+    "copied_total_bytes": 0,  # number of bytes written to dest
+    "skipped_total_bytes": 0 ,# bytes 'skipped' when file is already existing
     "source_filecount": 0,   # numbers of source files parsed
-    "source_total_bytes": 0, # number of bytes read from source
+    "source_total_bytes": 0,  # number of bytes read from source
 }
 MISSED_FILES = []
-
-# logging.basicConfig(
-#     filename=os.path.join("logs", "main.log"),
-#     filemode='w', level=logging.DEBUG)
 
 logging.basicConfig(
     handlers=[logging.FileHandler(os.path.join("logs", "main.log"), 'w', 'utf-8')],
@@ -51,9 +48,6 @@ def _reset_stats():
     # STATS["files_blacklisted"] = 0  # blacklist counter
     MISSED_FILES = []
 
-def print_config():
-    # logging.log("JSON config")
-    raise NotImplementedError("convert config.py to pretty JSON?")
 
 def print_stats(stats):
     msg_stats = (
@@ -83,10 +77,13 @@ def print_stats(stats):
     logging.info("\n{}\n".format(msg_stats))
     print(msg_stats)
 
+
 def walk_entry(app_config): # todo: only arg be config?
     # logic entry point
     source_root = app_config['source_dir']
     dest_root = app_config['dest_dir']
+    time_start = time.perf_counter()
+    time_end = time_start
 
     _reset_stats()
     STATS["backup_start"] = time.time()
@@ -102,6 +99,7 @@ def walk_entry(app_config): # todo: only arg be config?
             files=files,
         )
         logging.debug(msg)
+        time_end = time.perf_counter()
 
         STATS["source_filecount"] += 1
 
@@ -124,10 +122,11 @@ def walk_entry(app_config): # todo: only arg be config?
                 file,
             ))
 
-            if len(full_path_source) >= NTFS_LENGTH_LIMIT:
+            # currently required, otherwise length 250 will throw an exception
+            # if True or len(full_path_source) >= NTFS_LENGTH_LIMIT or len(full_path_dest) >= NTFS_LENGTH_LIMIT:
+            if USING_WINDOWS:
                 full_path_source = "\\\\?\\" + full_path_source
                 full_path_dest = "\\\\?\\" + full_path_dest
-
 
             size = os.path.getsize(full_path_source)
             STATS['source_total_bytes'] += size
@@ -144,7 +143,13 @@ def walk_entry(app_config): # todo: only arg be config?
             )
             logging.debug(msg)
             if not DISABLE_CONSOLE_IO:
-                print(msg)
+                # print(msg)
+                if time_end - time_start >= 5:
+                    time_start = time_end
+                    print("Copied {num}/total files and copied size={size}".format(
+                        num=STATS["source_filecount"],
+                        size=humanize_bytes(STATS['source_total_bytes']))
+                    )
 
             msg = (
                 "\nfull path  srd: {full_src}"
@@ -164,9 +169,16 @@ def walk_entry(app_config): # todo: only arg be config?
 
             os.makedirs(full_path_dest_dir, exist_ok=True)
             if not files_are_same(full_path_source, full_path_dest):
-                shutil.copy2(full_path_source, full_path_dest_dir)
+                try:
+                    shutil.copy2(full_path_source, full_path_dest_dir)
+                except PermissionError:
+                    logging.error("Permission error:\n\t source={source} \n\t dest={dest}".format(
+                        source=full_path_source,
+                        dest=full_path_dest))
+                    MISSED_FILES.append(full_path_dest)
+
                 # if not DISABLE_CONSOLE_IO:
-                print("+", end='', flush=True)# flush=True
+                # print("+", end='', flush=True)# flush=True
 
                 STATS["copied_total_bytes"] += size
                 STATS["copied_filecount"] += 1
@@ -196,6 +208,7 @@ def walk_entry(app_config): # todo: only arg be config?
 
     STATS["backup_end"] = time.time()
 
+
 def run(config_name):
     app_config = config.load_config(config_name)
     msg = "Config name = {}".format(app_config['name'])
@@ -208,6 +221,7 @@ def run(config_name):
     walk_entry(app_config)
     print_stats(STATS)
     print("Done: config = {config_name}".format(config_name=config_name))
+
 
 if __name__ == "__main__":
 

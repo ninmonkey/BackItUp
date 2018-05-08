@@ -36,6 +36,7 @@ app_config_all = [
         "dest_dir": "D:/backup_2018 automatic nin.BackItUp",
         "exclude_dirs": [
             "C:/$Recycle.Bin",
+            "C:/Users/cppmo_000/.gradle",
             "C:/Users/cppmo_000/Downloads",
             "C:/Users/cppmo_000/3D Objects",
             "C:/Users/cppmo_000/",
