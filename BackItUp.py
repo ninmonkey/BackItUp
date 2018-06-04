@@ -1,6 +1,5 @@
 from os.path import getsize, join
 import logging
-import logging
 import math
 import os
 import shutil
@@ -17,54 +16,61 @@ from app.app_locals import (
 import app
 from app import config
 
-USING_WINDOWS = True
+USING_WINDOWS = True  # use long filepath format on NTFS
 NTFS_LENGTH_LIMIT = 260
-DISABLE_CONSOLE_IO = False
+DISABLE_CONSOLE_IO = True
 WHATIF = False   # if True, disables writing
 STATS = {
     "backup_end": 0,
     "backup_start": 0,       # seconds
     "copied_filecount": 0,   # number of files copied (not skipped)
     "copied_total_bytes": 0,  # number of bytes written to dest
-    "skipped_total_bytes": 0 ,# bytes 'skipped' when file is already existing
+    "skipped_total_bytes": 0,  # bytes 'skipped' when file is already existing
     "source_filecount": 0,   # numbers of source files parsed
-    "source_total_bytes": 0,  # number of bytes read from source
+    "source_current_total_bytes": 0,  # current non-skipped bytes read from source
+    "source_initial_bytes": 0,  # initial (after filters)
 }
 MISSED_FILES = []
 
 logging.basicConfig(
     handlers=[logging.FileHandler(os.path.join("logs", "main.log"), 'w', 'utf-8')],
-    level=logging.DEBUG)
+    level=logging.INFO)
 
 
 def _reset_stats():
+    global STATS
+
     STATS["backup_end"] = 0         # seconds
     STATS["backup_start"] = 0       # seconds
     STATS["copied_filecount"] = 0   # number of files copied (not skipped)
-    STATS["copied_total_bytes"] = 0 # number of bytes written to dest
-    STATS["skipped_total_bytes"] = 0# bytes 'skipped' when file is already existing
+    STATS["copied_total_bytes"] = 0  # number of bytes written to dest
+    STATS["skipped_total_bytes"] = 0  # bytes 'skipped' when file is already existing
     STATS["source_filecount"] = 0   # numbers of source files parsed
-    STATS["source_total_bytes"] = 0 # number of bytes read from source
+    STATS["source_current_total_bytes"] = 0  # (actual non-dups) number of bytes read from source
+    STATS["source_initial_bytes"] = 0  # initial (after filters)
     # STATS["files_blacklisted"] = 0  # blacklist counter
+
     MISSED_FILES = []
 
 
 def print_stats(stats):
     msg_stats = (
         "\nStats"
-        "\ntotal size of source = {source_total_bytes}"
+        "\ninitial size of source = {source_initial_bytes}"
+        "\ntotal size of source = {source_current_total_bytes}"
         "\ntotal size (actually) copied from source = {copied_total_bytes}"
         "\ntotal size (total skipped duplicates) = {skipped_total_bytes}"
         "\ntotal files in source = {source_filecount}"
         "\ntotal files in copied = {copied_filecount}"
         "\nTime taken (in seconds) {time_secs:.3f}"
     ).format(
-        source_total_bytes=humanize_bytes(stats['source_total_bytes']),
+        source_initial_bytes=humanize_bytes(stats['source_initial_bytes']),
+        source_current_total_bytes=humanize_bytes(stats['source_current_total_bytes']),
         copied_total_bytes=humanize_bytes(stats['copied_total_bytes']),
         skipped_total_bytes=humanize_bytes(stats['skipped_total_bytes']),
-        source_filecount = stats['source_filecount'],
-        copied_filecount = stats['copied_filecount'],
-        time_secs = stats["backup_end"] - stats["backup_start"],
+        source_filecount=stats['source_filecount'],
+        copied_filecount=stats['copied_filecount'],
+        time_secs=stats["backup_end"] - stats["backup_start"],
     )
 
     msg = "Missing files from (>= 260) limit:"
@@ -78,14 +84,55 @@ def print_stats(stats):
     print(msg_stats)
 
 
-def walk_entry(app_config): # todo: only arg be config?
+def calculate_bytes_required(app_config):
+    # calculate total bytes from folder and children. Does not do any work
+    source_root = app_config['source_dir']
+    total_bytes = 0
+    for root, dirs, files in os.walk(source_root):
+        # 1. hardcoded filenames
+        for file in files[:]:
+            if file in app_config["exclude_files"]:
+                files.remove(file)
+
+        for file in files:
+            full_path_source = os.path.normpath(os.path.join(root, file))
+            if USING_WINDOWS:
+                full_path_source = "\\\\?\\" + full_path_source
+
+            total_bytes += os.path.getsize(full_path_source)
+
+
+        for cur_dir in dirs[:]:
+            full_dir_path = os.path.join(root, cur_dir)
+
+            # blacklist 3. fullpath dirs
+            for path in app_config["exclude_dirs"]:
+                if os.path.normpath(full_dir_path) == os.path.normpath(path):
+                    # logging.debug("Skipping blacklisted directory = {}".format(path))
+                    dirs.remove(cur_dir)
+                    continue
+
+    return total_bytes
+
+
+def walk_entry(app_config):  # todo: only arg be config?
     # logic entry point
+    global STATS
+
     source_root = app_config['source_dir']
     dest_root = app_config['dest_dir']
     time_start = time.perf_counter()
     time_end = time_start
 
     _reset_stats()
+
+    STATS["source_initial_bytes"] = calculate_bytes_required(app_config)
+    # print("source bytes = {size}".format(
+    #     size=humanize_bytes(calculate_bytes_required(app_config))
+    # ))
+    # logging.info("source bytes = {size}".format(
+    #     size=humanize_bytes(calculate_bytes_required(app_config))
+    # ))
     STATS["backup_start"] = time.time()
 
     for root, dirs, files in os.walk(source_root):
@@ -129,7 +176,7 @@ def walk_entry(app_config): # todo: only arg be config?
                 full_path_dest = "\\\\?\\" + full_path_dest
 
             size = os.path.getsize(full_path_source)
-            STATS['source_total_bytes'] += size
+            STATS['source_current_total_bytes'] += size
 
             full_path_dest_dir = os.path.dirname(full_path_dest)
 
@@ -148,7 +195,7 @@ def walk_entry(app_config): # todo: only arg be config?
                     time_start = time_end
                     print("Copied {num}/total files and copied size={size}".format(
                         num=STATS["source_filecount"],
-                        size=humanize_bytes(STATS['source_total_bytes']))
+                        size=humanize_bytes(STATS['source_current_total_bytes']))
                     )
 
             msg = (
@@ -174,7 +221,8 @@ def walk_entry(app_config): # todo: only arg be config?
                 except PermissionError:
                     logging.error("Permission error:\n\t source={source} \n\t dest={dest}".format(
                         source=full_path_source,
-                        dest=full_path_dest))
+                        dest=full_path_dest),
+                        exc_info=True)
                     MISSED_FILES.append(full_path_dest)
 
                 # if not DISABLE_CONSOLE_IO:
@@ -218,6 +266,7 @@ def run(config_name):
     print("WhatIf mode: {}".format(WHATIF))
     print_drive_usage(app_config["source_dir"])
     print_drive_usage(app_config["dest_dir"])
+
     walk_entry(app_config)
     print_stats(STATS)
     print("Done: config = {config_name}".format(config_name=config_name))

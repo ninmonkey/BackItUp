@@ -2,6 +2,7 @@ import os
 import shutil
 import logging
 
+
 def valid_path(path, create=True):
     if not path:
         raise ValueError("Path given is empty")

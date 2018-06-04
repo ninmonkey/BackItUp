@@ -2,7 +2,12 @@
 
 Easy to use program to backup data.
 
-todo
+# todo
+first:
+    - check if dest is too small
+    - print progress speed/sec every 5 seconds
+    - test dir ignore regex ~/.foo but whitelist ~/.jake
+    
 
 - extra logging on failure of 
  
@@ -13,6 +18,7 @@ todo
 - count stats how many files (and size) are updated
     (dest exists, yet source edited) 
 - example config
+- redirect main logging.info to STDOUT and still Logger
 
 # USING_WINDOWS
 
