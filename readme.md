@@ -4,7 +4,7 @@ Easy to use program to backup data.
 
 # todo
 first:
-    - check if dest is too small
+    - check if dest is too small (*before* copy start)
     - print progress speed/sec every 5 seconds
     - test dir ignore regex ~/.foo but whitelist ~/.jake
     
@@ -19,6 +19,8 @@ first:
     (dest exists, yet source edited) 
 - example config
 - redirect main logging.info to STDOUT and still Logger
+- de-duplicate logic in `calculate_bytes_required`
+- do I want case-insensitive match for paths to filter / keep?
 
 # USING_WINDOWS
 

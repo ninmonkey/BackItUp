@@ -78,6 +78,30 @@ app_config_all = [
             "ntuser.pol",
         ],
     },
+{
+        "name": "jake_photos 2018",
+        "source_dir": "G:/photos",
+        "dest_dir": "D:/backup_2018_photos",
+        "exclude_dirs": [
+            "C:/Users/cppmo_000/",
+        ],
+
+        # global excludes ignoring paths
+        "exclude_files": [
+            "$Recycle.Bin",
+            "pagefile.sys",
+            "swapfile.sys",
+            "hiberfil.sys",
+            "NTUSER.DAT",
+            "ntuser.dat.LOG1",
+            "ntuser.dat.LOG2",
+            "NTUSER.DAT{8a3f97ca-0156-11e8-89e1-00249b0e8d67}.TM.blf",
+            "NTUSER.DAT{8a3f97ca-0156-11e8-89e1-00249b0e8d67}.TMContainer00000000000000000001.regtrans-ms",
+            "NTUSER.DAT{8a3f97ca-0156-11e8-89e1-00249b0e8d67}.TMContainer00000000000000000002.regtrans-ms",
+            "ntuser.ini",
+            "ntuser.pol",
+        ],
+    },
 
 ]
 

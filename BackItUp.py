@@ -1,4 +1,5 @@
 from os.path import getsize, join
+import datetime
 import logging
 import math
 import os
@@ -18,8 +19,9 @@ from app import config
 
 USING_WINDOWS = True  # use long filepath format on NTFS
 NTFS_LENGTH_LIMIT = 260
-DISABLE_CONSOLE_IO = True
+DISABLE_CONSOLE_IO = False
 WHATIF = False   # if True, disables writing
+STR_DATE_FORMAT_SECONDS = '%Y/%m/%d %H:%M:%S'
 STATS = {
     "backup_end": 0,
     "backup_start": 0,       # seconds
@@ -101,7 +103,6 @@ def calculate_bytes_required(app_config):
 
             total_bytes += os.path.getsize(full_path_source)
 
-
         for cur_dir in dirs[:]:
             full_dir_path = os.path.join(root, cur_dir)
 
@@ -126,6 +127,7 @@ def walk_entry(app_config):  # todo: only arg be config?
 
     _reset_stats()
 
+    print("\nParsing files")
     STATS["source_initial_bytes"] = calculate_bytes_required(app_config)
     # print("source bytes = {size}".format(
     #     size=humanize_bytes(calculate_bytes_required(app_config))
@@ -193,13 +195,12 @@ def walk_entry(app_config):  # todo: only arg be config?
                 # print(msg)
                 if time_end - time_start >= 5:
                     time_start = time_end
-                    print("Copied {num}/total files and copied size={size}".format(
+                    print("Copied {num}/total files and copied size = {size}".format(
                         num=STATS["source_filecount"],
-                        size=humanize_bytes(STATS['source_current_total_bytes']))
-                    )
+                        size=humanize_bytes(STATS['source_current_total_bytes'])))
 
             msg = (
-                "\nfull path  srd: {full_src}"
+                "\nfull path  src: {full_src}"
                 "\nfull path dest: {full_dest}"
                 "\nfull path dest_dir: {full_dir}"
                 "\n"
@@ -262,6 +263,7 @@ def run(config_name):
     msg = "Config name = {}".format(app_config['name'])
     print(msg)
     logging.info(msg)
+    logging.info("Date = {date}".format(date=datetime.datetime.now().strftime(STR_DATE_FORMAT_SECONDS)))
 
     print("WhatIf mode: {}".format(WHATIF))
     print_drive_usage(app_config["source_dir"])
@@ -274,8 +276,9 @@ def run(config_name):
 
 if __name__ == "__main__":
 
-    run("debug")
-    # run("jake_backup 2018")
+    # run("debug")
+    run("jake_backup 2018")
+    run("jake_photos 2018")
 
     print("\nDone.")
 
